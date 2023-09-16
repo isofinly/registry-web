@@ -1,61 +1,61 @@
-version: "3.9"
-services:
-  postgres:
-    container_name: postgres_container_hackathon
-    image: postgres:latest
-    environment:
-      POSTGRES_DB: "postgres"
-      POSTGRES_USER: "postgres"
-      POSTGRES_PASSWORD: "pgpwd"
-      PGDATA: "/var/lib/postgresql/data/pgdata"
-    volumes:
-      - ./InitDatabase:/docker-entrypoint-initdb.d
-      - .:/var/lib/postgresql/data
-    ports:
-      - "5432:5432"
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d postgres"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 10s
-    restart: unless-stopped
-    networks:
-      - postgres
+# version: "3.9"
+# services:
+#   postgres:
+#     container_name: postgres_container_hackathon
+#     image: postgres:latest
+#     environment:
+#       POSTGRES_DB: "postgres"
+#       POSTGRES_USER: "postgres"
+#       POSTGRES_PASSWORD: "pgpwd"
+#       PGDATA: "/var/lib/postgresql/data/pgdata"
+#     volumes:
+#       - ./InitDatabase:/docker-entrypoint-initdb.d
+#       - .:/var/lib/postgresql/data
+#     ports:
+#       - "5432:5432"
+#     healthcheck:
+#       test: ["CMD-SHELL", "pg_isready -U postgres -d postgres"]
+#       interval: 10s
+#       timeout: 5s
+#       retries: 5
+#       start_period: 10s
+#     restart: unless-stopped
+#     networks:
+#       - postgres
 
-  pgadmin:
-    container_name: pgadmin_container_hackathon
-    image: dpage/pgadmin4:latest
-    environment:
-      PGADMIN_DEFAULT_EMAIL: "isofinly@icloud.com"
-      PGADMIN_DEFAULT_PASSWORD: "pgadminpwd"
-      PGADMIN_CONFIG_SERVER_MODE: "False"
-    volumes:
-      - ./pgadmin:/var/lib/pgadmin
-    ports:
-      - "5050:80"
-    restart: unless-stopped
-    networks:
-      - postgres
+#   pgadmin:
+#     container_name: pgadmin_container_hackathon
+#     image: dpage/pgadmin4:latest
+#     environment:
+#       PGADMIN_DEFAULT_EMAIL: "isofinly@icloud.com"
+#       PGADMIN_DEFAULT_PASSWORD: "pgadminpwd"
+#       PGADMIN_CONFIG_SERVER_MODE: "False"
+#     volumes:
+#       - ./pgadmin:/var/lib/pgadmin
+#     ports:
+#       - "5050:80"
+#     restart: unless-stopped
+#     networks:
+#       - postgres
 
-  app:
-    build:
-      context: ..
-      dockerfile: Dockerfile
-    container_name: docker-next
-    volumes:
-      - .:/app
-      - /app/node_modules
-    ports:
-      - "3000:3000"
-    environment:
-      DATABASE_URL: postgres://postgres:pgpwd@postgres:5432/prismadb?schema=public
-    depends_on:
-      - postgres
-    restart: unless-stopped
-    networks:
-      - postgres
+#   app:
+#     build:
+#       context: ..
+#       dockerfile: Dockerfile
+#     container_name: docker-next
+#     volumes:
+#       - .:/app
+#       - /app/node_modules
+#     ports:
+#       - "3000:3000"
+#     environment:
+#       DATABASE_URL: postgres://postgres:pgpwd@postgres:5432/prismadb?schema=public
+#     depends_on:
+#       - postgres
+#     restart: unless-stopped
+#     networks:
+#       - postgres
 
-networks:
-  postgres:
-    driver: bridge
+# networks:
+#   postgres:
+#     driver: bridge
