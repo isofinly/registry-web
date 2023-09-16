@@ -38,16 +38,18 @@ services:
     networks:
       - postgres
 
-  api:
-    container_name: api_container_hackathon
-    build: .
-    command: npm run dev
+  app:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    container_name: docker-next
     volumes:
-      - .:/usr/src/app
+      - .:/app
+      - /app/node_modules
     ports:
       - "3000:3000"
     environment:
-      DATABASE_URL: postgres://postgres:pgpwd@postgres:5432/postgres
+      DATABASE_URL: postgres://postgres:pgpwd@postgres:5432/prismadb?schema=public
     depends_on:
       - postgres
     restart: unless-stopped
