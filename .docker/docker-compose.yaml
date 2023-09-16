@@ -48,6 +48,25 @@ services:
     networks:
       - postgres
 
+  nodejs:
+    container_name: nodejs_container
+    build: .
+    image: node:latest
+    command: ["npm", "start", "--", "--log", "json", "--output", "/dev/stdout", "--level", "info"]
+    volumes:
+      - .:/app
+    ports:
+      - "3000:3000"
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 2G
+    networks:
+      - postgres
+
+
 networks:
   postgres:
     driver: bridge
