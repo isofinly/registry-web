@@ -1,7 +1,7 @@
 version: "3.9"
 services:
   postgres:
-    container_name: postgres_container
+    container_name: postgres_container_hackathon
     image: postgres:latest
     environment:
       POSTGRES_DB: "postgres"
@@ -29,7 +29,7 @@ services:
       - postgres
 
   pgadmin:
-    container_name: pgadmin_container
+    container_name: pgadmin_container_hackathon
     image: dpage/pgadmin4:latest
     environment:
       PGADMIN_DEFAULT_EMAIL: "isofinly@icloud.com"
