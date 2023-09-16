@@ -1,0 +1,260 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// model Account {
+//   id                String  @id @default(cuid())
+//   userId            String
+//   type              String
+//   provider          String
+//   providerAccountId String
+//   refresh_token     String? @db.Text
+//   access_token      String? @db.Text
+//   expires_at        Int?
+//   token_type        String?
+//   scope             String?
+//   id_token          String? @db.Text
+//   session_state     String?
+
+//   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+//   @@unique([provider, providerAccountId])
+// }
+
+// model Session {
+//   id           String   @id @default(cuid())
+//   sessionToken String   @unique
+//   userId       String
+//   expires      DateTime
+//   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+// }
+
+// model User {
+//   id               String             @id @default(cuid())
+//   name             String?
+//   email            String?            @unique
+//   emailVerified    DateTime?
+//   hashedPassword   String?
+//   image            String?
+//   accounts         Account[]
+//   sessions         Session[]
+//   Transactions     Transactions[]
+//   ApplicationForms ApplicationForms[]
+//   Benefits         Benefits[]
+// }
+
+// model VerificationToken {
+//   identifier String
+//   token      String   @unique
+//   expires    DateTime
+
+//   @@unique([identifier, token])
+// }
+
+// model Transactions {
+//   id          String   @id @default(cuid())
+//   userId      String
+//   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+//   amount      Float
+//   date        DateTime
+//   created_at  DateTime @default(now())
+//   coord_x     Float
+//   coord_y     Float
+// }
+
+// model ApplicationForms {
+//   id          String   @id @default(cuid())
+//   userId      String
+//   name        String
+//   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+//   email       String
+//   description String
+//   created_at  DateTime @default(now())
+//   updated_at  DateTime @updatedAt
+// }
+
+// model Benefits {
+//   id          String   @id @default(cuid())
+//   userId      String
+//   name        String
+//   email       String
+//   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+//   description String
+//   created_at  DateTime @default(now())
+//   updated_at  DateTime @updatedAt
+// }
+
+model A_State {
+  id           Int            @id @default(autoincrement())
+  type_state   String
+  S_Partner    S_Partner[]
+  U_Card       U_Card[]
+  Special_Card Special_Card[]
+  client       client[]
+  Stuff        Stuff[]
+}
+
+model Token_type {
+  id          Int      @id @default(autoincrement())
+  type_token  String
+  right_read  Boolean
+  right_write Boolean
+  right_edit  Boolean
+  right_admin Boolean
+  client      client[]
+  Stuff       Stuff[]
+}
+
+model U_Session {
+  id            Int       @id @default(autoincrement())
+  sessionToken  String
+  expires       Int?
+  last_activity DateTime?
+  client        client[]
+  Stuff         Stuff[]
+}
+
+model Shift {
+  id          Int      @id @default(autoincrement())
+  transport   String
+  shift_start DateTime
+  shift_end   DateTime
+  s_route     String
+  Stuff       Stuff[]
+}
+
+model S_Partner {
+  id              Int        @id @default(autoincrement())
+  p_name          String
+  email           String?    @unique
+  hashed_password String
+  refresh_token   String?
+  access_token    String?
+  expires_at      Int?
+  partner_states  Int?
+  A_State         A_State?    @relation(fields: [partner_states], references: [id])
+  Discount        Discount[]
+}
+
+model U_Card {
+  id         Int      @id @default(autoincrement())
+  c_number   String
+  c_state    Int
+  time_start DateTime
+  time_end   DateTime
+  A_State    A_State  @relation(fields: [c_state], references: [id])
+  client     client[]
+}
+
+model Special_Card {
+  id         Int      @id @default(autoincrement())
+  c_number   String
+  c_state    Int
+  time_start DateTime
+  time_end   DateTime
+  A_State    A_State  @relation(fields: [c_state], references: [id])
+  Stuff      Stuff[]
+}
+
+model client {
+  id              Int               @id @default(autoincrement())
+  first_name      String?
+  last_name       String?
+  middle_name     String?
+  sex             String?
+  email           String?           @unique
+  born            DateTime?
+  session_id      Int?
+  hashed_password String
+  refresh_token   String?
+  access_token    String?
+  expires_at      Int?
+  token_type      Int?
+  account_states  Int?
+  card_id         Int?
+  U_Session       U_Session?         @relation(fields: [session_id], references: [id])
+  Token_type      Token_type?       @relation(fields: [token_type], references: [id])
+  A_State         A_State?           @relation(fields: [account_states], references: [id])
+  U_Card          U_Card?            @relation(fields: [card_id], references: [id])
+  client_benefit  client_benefit[]
+  client_discount client_discount[]
+  U_Transaction   U_Transaction[]
+}
+
+model Benefit {
+  id             Int              @id @default(autoincrement())
+  b_name         String
+  b_value        Int
+  time_start     DateTime
+  time_end       DateTime
+  client_benefit client_benefit[]
+}
+
+model client_benefit {
+  id_client   Int     @map("id_client")
+  id_benefits Int     @map("id_benefits")
+  client      client  @relation(fields: [id_client], references: [id])
+  Benefit     Benefit @relation(fields: [id_benefits], references: [id])
+
+  @@id([id_client, id_benefits])
+}
+
+model Discount {
+  id              Int               @id @default(autoincrement())
+  d_name          String
+  d_value         Int
+  partnerId       Int
+  time_start      DateTime
+  time_end        DateTime
+  S_Partner       S_Partner         @relation(fields: [partnerId], references: [id])
+  client_discount client_discount[]
+}
+
+model client_discount {
+  id_client   Int      @map("id_client")
+  id_discount Int      @map("id_discount")
+  client      client   @relation(fields: [id_client], references: [id])
+  Discount    Discount @relation(fields: [id_discount], references: [id])
+
+  @@id([id_client, id_discount])
+}
+
+model U_Transaction {
+  id       Int      @id @default(autoincrement())
+  clientId Int?
+  amount   Float
+  birth    DateTime
+  coord_x  Float?
+  coord_y  Float?
+  benefits Boolean
+  client   client?  @relation(fields: [clientId], references: [id])
+}
+
+model Stuff {
+  id              Int          @id @default(autoincrement())
+  first_name      String
+  last_name       String
+  middle_name     String
+  sex             String
+  email           String?      @unique
+  born            DateTime
+  session_id      Int
+  hashed_password String
+  refresh_token   String?
+  access_token    String?
+  expires_at      Int?
+  token_type      Int
+  stuff_states    Int
+  card_id         Int
+  shift_id        Int
+  U_Session       U_Session    @relation(fields: [session_id], references: [id])
+  Token_type      Token_type   @relation(fields: [token_type], references: [id])
+  A_State         A_State      @relation(fields: [stuff_states], references: [id])
+  Special_Card    Special_Card @relation(fields: [card_id], references: [id])
+  Shift           Shift        @relation(fields: [shift_id], references: [id])
+}

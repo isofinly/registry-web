@@ -63,20 +63,12 @@ export default function Page() {
     return () => clearInterval(interval);
   }, []);
 
-  const { data: session, status } = useSession({
-    required: true,
-  });
-
-  if(status === "loading") {
-    return <></>
-  }
-
   return (
     <>
       <Spacer x={2} />
 
-      <div class="grid justify-items-center justify-center">
-        <div class="grid grid-cols-3 gap-2 w-[70vw]">
+      <div className="grid justify-items-center justify-center">
+        <div className="grid grid-cols-3 gap-2 w-[70vw]">
           <Card className="py-4 w-fit col-span-1">
             <CardHeader className="pb-0 pt-2 px-4 flex-col items-start">
               <p className="text-tiny uppercase font-bold">Пользователи</p>
