@@ -1,0 +1,174 @@
+{
+  "results": [
+    {
+      "id": 1,
+      "card_number": "1234567890123456",
+      "time_active": {
+        "start": "2020-09-17T09:00:00Z",
+        "end": "2023-09-17T10:00:00Z"
+      },
+      "last_activity": "2023-09-17T09:30:00Z",
+      "user": {
+        "first_name": "John",
+        "middle_name": "",
+        "last_name": "Doe",
+        "id": 1
+      },
+      "uID": "1234567890123456",
+      "status": "active"
+    },
+    {
+      "id": 2,
+      "card_number": "2345678901234567",
+      "time_active": {
+        "start": "2020-09-17T09:00:00Z",
+        "end": "2023-09-17T10:00:00Z"
+      },
+      "last_activity": "2023-09-17T09:30:00Z",
+      "user": {
+        "first_name": "Jane",
+        "middle_name": "",
+        "last_name": "Smith",
+        "id": 2
+      },
+      "uID": "2345678901234567",
+      "status": "active"
+    },
+    {
+      "id": 3,
+      "card_number": "3456789012345678",
+      "time_active": {
+        "start": "2020-09-17T09:00:00Z",
+        "end": "2023-09-17T10:00:00Z"
+      },
+      "last_activity": "2023-09-17T09:30:00Z",
+      "user": {
+        "first_name": "Michael",
+        "middle_name": "",
+        "last_name": "Johnson",
+        "id": 3
+      },
+      "uID": "3456789012345678",
+      "status": "active"
+    },
+    {
+      "id": 4,
+      "card_number": "4567890123456789",
+      "time_active": {
+        "start": "2020-09-17T09:00:00Z",
+        "end": "2023-09-17T10:00:00Z"
+      },
+      "last_activity": "2023-09-17T09:30:00Z",
+      "user": {
+        "first_name": "Emily",
+        "middle_name": "",
+        "last_name": "Brown",
+        "id": 4
+      },
+      "uID": "4567890123456789",
+      "status": "active"
+    },
+    {
+      "id": 5,
+      "card_number": "5678901234567890",
+      "time_active": {
+        "start": "2020-09-17T09:00:00Z",
+        "end": "2023-09-17T10:00:00Z"
+      },
+      "last_activity": "2023-09-17T09:30:00Z",
+      "user": {
+        "first_name": "David",
+        "middle_name": "",
+        "last_name": "Taylor",
+        "id": 5
+      },
+      "uID": "5678901234567890",
+      "status": "active"
+    },
+    {
+      "id": 6,
+      "card_number": "6789012345678901",
+      "time_active": {
+        "start": "2020-09-17T09:00:00Z",
+        "end": "2023-09-17T10:00:00Z"
+      },
+      "last_activity": "2023-09-17T09:30:00Z",
+      "user": {
+        "first_name": "Olivia",
+        "middle_name": "",
+        "last_name": "Lee",
+        "id": 6
+      },
+      "uID": "6789012345678901",
+      "status": "active"
+    },
+    {
+      "id": 7,
+      "card_number": "7890123456789012",
+      "time_active": {
+        "start": "2020-09-17T09:00:00Z",
+        "end": "2023-09-17T10:00:00Z"
+      },
+      "last_activity": "2023-09-17T09:30:00Z",
+      "user": {
+        "first_name": "James",
+        "middle_name": "",
+        "last_name": "Wilson",
+        "id": 7
+      },
+      "uID": "7890123456789012",
+      "status": "active"
+    },
+    {
+      "id": 8,
+      "card_number": "8901234567890123",
+      "time_active": {
+        "start": "2020-09-17T09:00:00Z",
+        "end": "2023-09-17T10:00:00Z"
+      },
+      "last_activity": "2023-09-17T09:30:00Z",
+      "user": {
+        "first_name": "Sophia",
+        "middle_name": "",
+        "last_name": "Anderson",
+        "id": 8
+      },
+      "uID": "8901234567890123",
+      "status": "active"
+    },
+    {
+      "id": 9,
+      "card_number": "9012345678901234",
+      "time_active": {
+        "start": "2020-09-17T09:00:00Z",
+        "end": "2023-09-17T10:00:00Z"
+      },
+      "last_activity": "2023-09-17T09:30:00Z",
+      "user": {
+        "first_name": "Daniel",
+        "middle_name": "",
+        "last_name": "Martinez",
+        "id": 9
+      },
+      "uID": "9012345678901234",
+      "status": "active"
+    },
+    {
+      "id": 10,
+      "card_number": "0123456789012345",
+      "time_active": {
+        "start": "2020-09-17T09:00:00Z",
+        "end": "2023-09-17T10:00:00Z"
+      },
+      "last_activity": "2023-09-17T09:30:00Z",
+      "user": {
+        "first_name": "Ava",
+        "middle_name": "",
+        "last_name": "Garcia",
+        "id": 10
+      },
+      "uID": "0123456789012345",
+      "status": "active"
+    }
+  ]
+}

@@ -19,9 +19,7 @@ const ServerProtectedPage = ({ children }: { children: React.ReactNode }) => {
   return (
     <>
       <NavComponent />
-    <div className="grid justify-center">
-      {children}
-      </div>
+      <div className="grid justify-center">{children}</div>
     </>
   );
 };

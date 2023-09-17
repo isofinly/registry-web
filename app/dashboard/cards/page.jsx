@@ -1,13 +1,12 @@
 "use client";
 import React from "react";
-import { EditIcon } from "../../components/icons";
-import { DeleteIcon } from "../../components/icons";
-import { EyeIcon } from "../../components/icons";
-import { PlusIcon } from "../../components/icons";
-import { ChevronDownIcon } from "../../components/icons";
-import { SearchIcon } from "../../components/icons";
-import { columns, statusOptions } from "../../utils/userData";
+import { SearchIcon, ChevronDownIcon, PlusIcon, EyeIcon, DeleteIcon } from "../../components/icons";
+import BlockIcon from "@mui/icons-material/Block";
+import { columns, statusOptions } from "../../utils/cardsData";
 import { capitalize } from "../../utils/utils";
+import EditIcon from "@mui/icons-material/Edit";
+import PublishIcon from "@mui/icons-material/Publish";
+import GetAppIcon from "@mui/icons-material/GetApp";
 
 import useSWR from "swr";
 
@@ -45,18 +44,19 @@ import {
 
 const statusColorMap = {
   active: "success",
-  paused: "danger",
+  blocked: "danger",
   suspended: "warning",
 };
 
 const INITIAL_VISIBLE_COLUMNS = [
-  "first_name",
-  "middle_name",
-  "last_name",
-  "born",
-  "city",
+  "id",
   "card_id",
-  "account_states",
+  "card_number",
+  "time_active",
+  "last_activity",
+  "uID",
+  "user",
+  "status",
   "actions",
 ];
 
@@ -77,14 +77,14 @@ export default function App() {
   const [page, setPage] = React.useState(1);
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
-  const { data, isLoading } = useSWR(`/users.json`, fetcher, {
+  const { data, isLoading } = useSWR(`/cards.json`, fetcher, {
     keepPreviousData: true,
   });
 
   const loadingState =
     isLoading || data?.results.length === 0 ? "Загрузка" : "Неактивен";
 
-  const users = React.useMemo(() => data?.results || [], [data]);
+  const transactions = React.useMemo(() => data?.results || [], [data]);
 
   const hasSearchFilter = Boolean(filterValue);
 
@@ -97,27 +97,25 @@ export default function App() {
   }, [visibleColumns]);
 
   const filteredItems = React.useMemo(() => {
-    let filteredUsers = [...users];
+    let filteredTransactions = [...transactions];
 
     if (hasSearchFilter) {
-      filteredUsers = filteredUsers.filter(
-        (user) =>
-          user.first_name.toLowerCase().includes(filterValue.toLowerCase()) ||
-          user.last_name.toLowerCase().includes(filterValue.toLowerCase()) ||
-          user.middle_name.toLowerCase().includes(filterValue.toLowerCase())
+      filteredTransactions = filteredTransactions.filter(
+        (transaction) =>
+          transaction.card_number.includes(filterValue.toLowerCase())
       );
     }
     if (
       statusFilter !== "all" &&
       Array.from(statusFilter).length !== statusOptions.length
     ) {
-      filteredUsers = filteredUsers.filter((user) =>
-        Array.from(statusFilter).includes(user.account_states)
+      filteredTransactions = filteredTransactions.filter((transaction) =>
+        Array.from(statusFilter).includes(transaction.state)
       );
     }
 
-    return filteredUsers;
-  }, [users, hasSearchFilter, statusFilter, filterValue]);
+    return filteredTransactions;
+  }, [transactions, hasSearchFilter, statusFilter, filterValue]);
 
   const pages = Math.ceil(filteredItems.length / rowsPerPage);
 
@@ -144,30 +142,40 @@ export default function App() {
     switch (columnKey) {
       case "id":
         return cellValue;
-      case "first_name":
-      case "last_name":
-      case "middle_name":
-        return cellValue.toUpperCase();
-      case "sex":
-        return cellValue === "M" ? "Мужской" : "Женский";
-      case "email":
+      case "card_number":
+        return cellValue;
+      case "amount":
+        return cellValue;
+      case "time_active":
+        return (
+          <div className="px-1 py-2">
+            <div className="text-small font-bold">
+              Активна до: {cellValue.end}
+            </div>
+            <div className="text-tiny">Активирована: {cellValue.start}</div>
+          </div>
+        );
+      case "last_activity":
+        return (
+          <div className="px-1 py-2">
+            <div className="text-small font-bold">{cellValue}</div>
+          </div>
+        );
+      case "user":
         return (
           <User
-            description={user.email}
-            name={user.first_name + " " + user.last_name}
+            description={cellValue.id}
+            name={cellValue.first_name + " " + cellValue.middle_name + " " + cellValue.last_name}
           >
-            {user.email}
           </User>
         );
-      case "born":
-        return new Date(cellValue).toLocaleDateString();
-      case "city":
-        return cellValue.charAt(0).toUpperCase() + cellValue.slice(1);
-      case "account_states":
+      case "uID":
+        return cellValue;
+      case "status":
         return (
           <Chip
             className="capitalize"
-            color={statusColorMap[user.account_states]}
+            color={statusColorMap[cellValue]}
             size="sm"
             variant="flat"
           >
@@ -175,34 +183,18 @@ export default function App() {
           </Chip>
         );
       case "card_id":
-        return user.card_id;
+        return cellValue;
       case "actions":
         return (
           <div className="relative flex items-center gap-2">
-            <Tooltip
-              content={
-                <div className="px-1 py-2">
-                  <div className="text-small font-bold">
-                    Последняя активность: {user.last_activity}
-                  </div>
-                  <div className="text-tiny">
-                    ID устройства: {user.deviceId}
-                  </div>
-                </div>
-              }
-            >
-              <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
-                <EyeIcon />
-              </span>
-            </Tooltip>
-            <Tooltip content="Изменить">
+            <Tooltip content="Изменить статус">
               <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
                 <EditIcon />
               </span>
             </Tooltip>
-            <Tooltip color="danger" content="Удалить">
+            <Tooltip color="danger" content="Заблокировать">
               <span className="text-lg text-danger cursor-pointer active:opacity-50">
-                <DeleteIcon />
+                <BlockIcon />
               </span>
             </Tooltip>
           </div>
@@ -250,7 +242,7 @@ export default function App() {
           <Input
             isClearable
             className="w-full sm:max-w-[44%]"
-            placeholder="Поиск по ФИО..."
+            placeholder="Поиск по номеру карты..."
             startContent={<SearchIcon />}
             value={filterValue}
             onClear={() => onClear()}
@@ -305,17 +297,20 @@ export default function App() {
                 ))}
               </DropdownMenu>
             </Dropdown>
-            <Button color="primary" endContent={<PlusIcon />}>
-              Добавить
+            <Button color="primary" endContent={<GetAppIcon />}>
+              Импорт
+            </Button>
+            <Button color="primary" endContent={<PublishIcon />}>
+              Экспорт
             </Button>
           </div>
         </div>
         <div className="flex justify-between items-center">
           <span className="text-default-400 text-small">
-            Всего {users.length} пользователей
+            Всего {transactions.length} карт
           </span>
           <label className="flex items-center text-default-400 text-small">
-            Количество строк:
+            Количество строк: 
             <select
               className="bg-transparent outline-none text-default-400 text-small"
               onChange={onRowsPerPageChange}
@@ -333,7 +328,7 @@ export default function App() {
     onSearchChange,
     statusFilter,
     visibleColumns,
-    users.length,
+    transactions.length,
     onRowsPerPageChange,
     onClear,
   ]);
@@ -408,7 +403,7 @@ export default function App() {
           )}
         </TableHeader>
         <TableBody
-          emptyContent={"No users found"}
+          emptyContent={"No transactions found"}
           items={sortedItems}
           loadingContent={<Spinner />}
           loadingState={loadingState}
