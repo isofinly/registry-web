@@ -11,9 +11,11 @@ export default function RootLayout({children}: { children: React.ReactNode }) {
     <html lang="ru">
       <link rel="icon" href="/favicon.ico" />
       <body>
+        <main className="light text-foreground bg-background">
         <Providers>
           {children}
         </Providers>
+        </main>
       </body>
     </html>
   );

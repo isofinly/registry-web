@@ -1,0 +1,312 @@
+{
+  "results": [
+    {
+      "id": 1,
+      "time": "2023-09-17",
+      "amount": "50",
+      "benefit": {
+        "amount": "0",
+        "type": "none"
+      },
+      "coordinates": {
+        "lat": "40.7128",
+        "lon": "-74.0060"
+      },
+      "card_id": 123456789,
+      "conductor": {
+        "first_name": "Aboba",
+        "last_name": "Kabob",
+        "middle_name": "Klaaa",
+        "shift": "1"
+      },
+      "city": "New York City",
+      "state": "blocked"
+    },
+    {
+      "id": 2,
+      "time": "2023-09-16",
+      "amount": "100",
+      "benefit": {
+        "amount": "0",
+        "type": "none"
+      },
+      "coordinates": {
+        "lat": "51.5074",
+        "lon": "-0.1278"
+      },
+      "card_id": 987654321,
+      "conductor": {
+        "first_name": "Aboba",
+        "last_name": "Kabob",
+        "middle_name": "Klaaa",
+        "shift": "1"
+      },
+      "city": "London",
+      "state": "suspended"
+    },
+    {
+      "id": 3,
+      "time": "2023-09-15",
+      "amount": "75",
+      "benefit": {
+        "amount": "10",
+        "type": "senior"
+      },
+      "coordinates": {
+        "lat": "48.8566",
+        "lon": "2.3522"
+      },
+      "card_id": 2468101214,
+      "conductor": {
+        "first_name": "Aboba",
+        "last_name": "Kabob",
+        "middle_name": "Klaaa",
+        "shift": "1"
+      },
+      "city": "Paris",
+      "state": "completed"
+    },
+    {
+      "id": 4,
+      "time": "2023-09-14",
+      "amount": "200",
+      "benefit": {
+        "amount": "0",
+        "type": "none"
+      },
+      "coordinates": {
+        "lat": "35.6895",
+        "lon": "139.6917"
+      },
+      "card_id": 1357924680,
+      "conductor": {
+        "first_name": "Aboba",
+        "last_name": "Kabob",
+        "middle_name": "Klaaa",
+        "shift": "1"
+      },
+      "city": "Tokyo",
+      "state": "completed"
+    },
+    {
+      "id": 5,
+      "time": "2023-09-13",
+      "amount": "150",
+      "benefit": {
+        "amount": "5",
+        "type": "student"
+      },
+      "coordinates": {
+        "lat": "40.4168",
+        "lon": "-3.7038"
+      },
+      "card_id": 369121518,
+      "conductor": {
+        "first_name": "Aboba",
+        "last_name": "Kabob",
+        "middle_name": "Klaaa",
+        "shift": "1"
+      },
+      "city": "Madrid",
+      "state": "suspended"
+    },
+    {
+      "id": 6,
+      "time": "2023-09-12",
+      "amount": "100",
+      "benefit": {
+        "amount": "0",
+        "type": "none"
+      },
+      "coordinates": {
+        "lat": "52.5200",
+        "lon": "13.4050"
+      },
+      "card_id": 1212121212,
+      "conductor": {
+        "first_name": "Aboba",
+        "last_name": "Kabob",
+        "middle_name": "Klaaa",
+        "shift": "1"
+      },
+      "city": "Berlin",
+      "state": "completed"
+    },
+    {
+      "id": 7,
+      "time": "2023-09-11",
+      "amount": "80",
+      "benefit": {
+        "amount": "0",
+        "type": "none"
+      },
+      "coordinates": {
+        "lat": "55.7558",
+        "lon": "37.6173"
+      },
+      "card_id": 9876543210,
+      "conductor": {
+        "first_name": "Aboba",
+        "last_name": "Kabob",
+        "middle_name": "Klaaa",
+        "shift": "1"
+      },
+      "city": "Moscow",
+      "state": "completed"
+    },
+    {
+      "id": 8,
+      "time": "2023-09-10",
+      "amount": "120",
+      "benefit": {
+        "amount": "15",
+        "type": "senior"
+      },
+      "coordinates": {
+        "lat": "37.7749",
+        "lon": "-122.4194"
+      },
+      "card_id": 2468101214,
+      "conductor": {
+        "first_name": "Aboba",
+        "last_name": "Kabob",
+        "middle_name": "Klaaa",
+        "shift": "1"
+      },
+      "city": "San Francisco",
+      "state": "completed"
+    },
+    {
+      "id": 9,
+      "time": "2023-09-09",
+      "amount": "90",
+      "benefit": {
+        "amount": "0",
+        "type": "none"
+      },
+      "coordinates": {
+        "lat": "45.5017",
+        "lon": "-73.5673"
+      },
+      "card_id": 369121518,
+      "conductor": {
+        "first_name": "Aboba",
+        "last_name": "Kabob",
+        "middle_name": "Klaaa",
+        "shift": "1"
+      },
+      "city": "Montreal",
+      "state": "completed"
+    },
+    {
+      "id": 10,
+      "time": "2023-09-08",
+      "amount": "70",
+      "benefit": {
+        "amount": "0",
+        "type": "none"
+      },
+      "coordinates": {
+        "lat": "37.5665",
+        "lon": "126.9780"
+      },
+      "card_id": 1212121212,
+      "conductor": {
+        "first_name": "Aboba",
+        "last_name": "Kabob",
+        "middle_name": "Klaaa",
+        "shift": "1"
+      },
+      "city": "Seoul",
+      "state": "completed"
+    },
+    {
+      "id": 11,
+      "time": "2023-09-07",
+      "amount": "60",
+      "benefit": {
+        "amount": "0",
+        "type": "none"
+      },
+      "coordinates": {
+        "lat": "31.2304",
+        "lon": "121.4737"
+      },
+      "card_id": 9876543210,
+      "conductor": {
+        "first_name": "Aboba",
+        "last_name": "Kabob",
+        "middle_name": "Klaaa",
+        "shift": "1"
+      },
+      "city": "Shanghai",
+      "state": "completed"
+    },
+    {
+      "id": 12,
+      "time": "2023-09-06",
+      "amount": "110",
+      "benefit": {
+        "amount": "0",
+        "type": "none"
+      },
+      "coordinates": {
+        "lat": "55.7558",
+        "lon": "37.6173"
+      },
+      "card_id": 2468101214,
+      "conductor": {
+        "first_name": "Aboba",
+        "last_name": "Kabob",
+        "middle_name": "Klaaa",
+        "shift": "1"
+      },
+      "city": "Moscow",
+      "state": "completed"
+    },
+    {
+      "id": 13,
+      "time": "2023-09-05",
+      "amount": "85",
+      "benefit": {
+        "amount": "0",
+        "type": "none"
+      },
+      "coordinates": {
+        "lat": "51.5074",
+        "lon": "-0.1278"
+      },
+      "card_id": 369121518,
+      "conductor": {
+        "first_name": "Aboba",
+        "last_name": "Kabob",
+        "middle_name": "Klaaa",
+        "shift": "1"
+      },
+      "city": "London",
+      "state": "blocked"
+    },
+    {
+      "id": 14,
+      "time": "2023-09-04",
+      "amount": "95",
+      "benefit": {
+        "amount": "0",
+        "type": "none"
+      },
+      "coordinates": {
+        "lat": "48.8566",
+        "lon": "2.3522"
+      },
+      "card_id": 1212121212,
+      "conductor": {
+        "first_name": "Aboba",
+        "last_name": "Kabob",
+        "middle_name": "Klaaa",
+        "shift": "1"
+      },
+      "city": "Paris",
+      "state": "blocked"
+    }
+  ]
+}
