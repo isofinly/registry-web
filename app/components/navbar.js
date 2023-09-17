@@ -65,196 +65,42 @@ export default function NavbarComponent() {
 
         <NavbarContent className="hidden sm:flex gap-6" justify="center">
           <NavbarItem>
-            <Link href="#" aria-current="page">
+            <Link href="/dashboard" aria-current="page">
               Главная
             </Link>
           </NavbarItem>
 
           <NavbarItem>
-            <Link color="foreground" href="#">
+            <Link color="foreground" href="/dashboard/transactions">
               Транзакции
             </Link>
           </NavbarItem>
 
-          <Dropdown>
-            <NavbarItem>
-              <DropdownTrigger>
-                <Button
-                  disableRipple
-                  className="p-0 bg-transparent data-[hover=true]:bg-transparent"
-                  endContent={icons.chevron}
-                  // variant="flat"
-                  // color="primary"
-                  // radius="sm"
-                >
-                  <p className="font-bold text-inherit">Карты</p>
-                </Button>
-              </DropdownTrigger>
-            </NavbarItem>
-            <DropdownMenu
-              aria-label="ACME features"
-              className="w-[340px]"
-              itemClasses={{
-                base: "gap-4",
-              }}
-            >
-              <DropdownItem
-                key="autoscaling"
-                description="ACME scales apps to meet user demand, automagically, based on load."
-                startContent={icons.flash}
-              >
-                Выпуск карты
-              </DropdownItem>
-              <DropdownItem
-                key="usage_metrics"
-                description="Real-time metrics to debug issues. Slow query added? We’ll show you exactly where."
-                startContent={icons.activity}
-              >
-                Информация о карте
-              </DropdownItem>
-              <DropdownItem
-                key="production_ready"
-                description="ACME runs on ACME, join us and others serving requests at web scale."
-                startContent={icons.scale}
-              >
-                Production Ready
-              </DropdownItem>
-              <DropdownItem
-                key="99_uptime"
-                description="Applications stay on the grid with high availability and high uptime guarantees."
-                startContent={icons.server}
-              >
-                +99% Uptime
-              </DropdownItem>
-              <DropdownItem
-                key="supreme_support"
-                description="Overcome any challenge with a supporting team ready to respond."
-                startContent={icons.user}
-              >
-                Изменение данных
-              </DropdownItem>
-            </DropdownMenu>
-          </Dropdown>
+          <NavbarItem>
+            <Link color="foreground" href="/dashboard/cards">
+              Карты
+            </Link>
+          </NavbarItem>
 
-          <Dropdown>
-            <NavbarItem>
-              <DropdownTrigger>
-                <Button
-                  disableRipple
-                  className="p-0 bg-transparent data-[hover=true]:bg-transparent"
-                  endContent={icons.chevron}
-                  // variant="flat"
-                  // color="primary"
-                  // radius="sm"
-                >
-                  <p className="font-bold text-inherit">Пользователи</p>
-                </Button>
-              </DropdownTrigger>
-            </NavbarItem>
-            <DropdownMenu
-              aria-label="ACME features"
-              className="w-[340px]"
-              itemClasses={{
-                base: "gap-4",
-              }}
-            >
-              <DropdownItem
-                key="autoscaling"
-                description="ACME scales apps to meet user demand, automagically, based on load."
-                startContent={icons.flash}
-              >
-                Регистрация
-              </DropdownItem>
-              <DropdownItem
-                key="usage_metrics"
-                description="Real-time metrics to debug issues. Slow query added? We’ll show you exactly where."
-                startContent={icons.activity}
-              >
-                Информация
-              </DropdownItem>
-              {/* <DropdownItem
-              key="production_ready"
-              description="ACME runs on ACME, join us and others serving requests at web scale."
-              startContent={icons.scale}
-            >
-              Production Ready
-            </DropdownItem>
-            <DropdownItem
-              key="99_uptime"
-              description="Applications stay on the grid with high availability and high uptime guarantees."
-              startContent={icons.server}
-            >
-              +99% Uptime
-            </DropdownItem> */}
-              <DropdownItem
-                key="supreme_support"
-                description="Overcome any challenge with a supporting team ready to respond."
-                startContent={icons.user}
-              >
-                Изменение данных
-              </DropdownItem>
-            </DropdownMenu>
-          </Dropdown>
+          <NavbarItem>
+            <Link color="foreground" href="/dashboard/users">
+              Пользователи
+            </Link>
+          </NavbarItem>
 
-          <Dropdown>
-            <NavbarItem>
-              <DropdownTrigger>
-                <Button
-                  disableRipple
-                  className="p-0 bg-transparent data-[hover=true]:bg-transparent"
-                  endContent={icons.chevron}
-                  // variant="flat"
-                  // color="primary"
-                  // radius="sm"
-                >
-                  <p className="font-bold text-inherit">Пособия/льготы</p>
-                </Button>
-              </DropdownTrigger>
-            </NavbarItem>
-            <DropdownMenu
-              aria-label="ACME features"
-              className="w-[340px]"
-              itemClasses={{
-                base: "gap-4",
-              }}
-            >
-              <DropdownItem
-                key="autoscaling"
-                description="ACME scales apps to meet user demand, automagically, based on load."
-                startContent={icons.flash}
-              >
-                Социальные льготы
-              </DropdownItem>
-              <DropdownItem
-                key="usage_metrics"
-                description="Real-time metrics to debug issues. Slow query added? We’ll show you exactly where."
-                startContent={icons.activity}
-              >
-                Статистика использования
-              </DropdownItem>
-              <DropdownItem
-                key="production_ready"
-                description="ACME runs on ACME, join us and others serving requests at web scale."
-                startContent={icons.scale}
-              >
-                Назначение категории
-              </DropdownItem>
-              {/* <DropdownItem
-              key="99_uptime"
-              description="Applications stay on the grid with high availability and high uptime guarantees."
-              startContent={icons.server}
-            >
-              Abuadsuisa
-            </DropdownItem> */}
-              <DropdownItem
-                key="supreme_support"
-                description="Overcome any challenge with a supporting team ready to respond."
-                startContent={icons.user}
-              >
-                Обработка заявок
-              </DropdownItem>
-            </DropdownMenu>
-          </Dropdown>
+          <NavbarItem>
+            <Link color="foreground" href="/dashboard/benefits">
+              Пособия/льготы
+            </Link>
+          </NavbarItem>
+
+          <NavbarItem>
+            <Link color="foreground" href="/dashboard/managment">
+              Управление
+            </Link>
+          </NavbarItem>
+
+          
         </NavbarContent>
 
         <Divider orientation="vertical" />

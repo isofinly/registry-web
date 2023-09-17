@@ -44,7 +44,9 @@ const LoginPage = () => {
       ...data,
       redirect: false,
     }).then(()=>
-      router.push("/dashboard"));
+      router.push("/dashboard")
+      );
+    
   };
 
   return (

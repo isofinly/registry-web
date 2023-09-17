@@ -7,7 +7,7 @@ import { PrismaAdapter } from "@auth/prisma-adapter";
 const prisma = new PrismaClient();
 
 export const authOptions = {
-  adapet: PrismaAdapter(prisma),
+  adapter: PrismaAdapter(prisma),
   providers: [
     CredentialsProvider({
       name: "Credentials",
