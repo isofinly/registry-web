@@ -1,10 +1,13 @@
 "use client";
 import React from "react";
-import { SearchIcon, ChevronDownIcon, PlusIcon, EyeIcon, DeleteIcon } from "../../components/icons";
-import BlockIcon from "@mui/icons-material/Block";
-import { columns, statusOptions } from "../../utils/transactionData";
+import { EditIcon } from "../../components/icons";
+import { DeleteIcon } from "../../components/icons";
+import { EyeIcon } from "../../components/icons";
+import { PlusIcon } from "../../components/icons";
+import { ChevronDownIcon } from "../../components/icons";
+import { SearchIcon } from "../../components/icons";
+import { columns, statusOptions } from "../../utils/discountData";
 import { capitalize } from "../../utils/utils";
-import EditIcon from "@mui/icons-material/Edit";
 
 import useSWR from "swr";
 
@@ -41,21 +44,15 @@ import {
 } from "@nextui-org/react";
 
 const statusColorMap = {
-  completed: "success",
-  blocked: "danger",
-  suspended: "warning",
+  active: "success",
+  delete: "danger",
+  pause: "warning",
 };
 
 const INITIAL_VISIBLE_COLUMNS = [
-  "id",
-  "time",
-  "amount",
-  "benefit",
-  "coordinates",
-  "card_id",
-  "conductor",
-  "city",
-  "state",
+  "name",
+  "value",
+  "status",
   "actions",
 ];
 
@@ -76,14 +73,14 @@ export default function App() {
   const [page, setPage] = React.useState(1);
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
-  const { data, isLoading } = useSWR(`/transactionData.json`, fetcher, {
+  const { data, isLoading } = useSWR(`/discount.json`, fetcher, {
     keepPreviousData: true,
   });
 
   const loadingState =
     isLoading || data?.results.length === 0 ? "Загрузка" : "Неактивен";
 
-  const transactions = React.useMemo(() => data?.results || [], [data]);
+  const users = React.useMemo(() => data?.results || [], [data]);
 
   const hasSearchFilter = Boolean(filterValue);
 
@@ -96,25 +93,38 @@ export default function App() {
   }, [visibleColumns]);
 
   const filteredItems = React.useMemo(() => {
-    let filteredTransactions = [...transactions];
+    let filteredUsers = [...users];
 
     if (hasSearchFilter) {
-      filteredTransactions = filteredTransactions.filter(
-        (transaction) =>
-          transaction.card_id.includes(filterValue.toLowerCase())
+      filteredUsers = filteredUsers.filter(
+          (user) =>
+              user.name.toLowerCase().includes(filterValue.toLowerCase())
       );
     }
     if (
-      statusFilter !== "all" &&
-      Array.from(statusFilter).length !== statusOptions.length
+        statusFilter !== "all" &&
+        Array.from(statusFilter).length !== statusOptions.length
     ) {
-      filteredTransactions = filteredTransactions.filter((transaction) =>
-        Array.from(statusFilter).includes(transaction.state)
+      filteredUsers = filteredUsers.filter((user) =>
+          Array.from(statusFilter).includes(user.account_states)
       );
     }
 
-    return filteredTransactions;
-  }, [transactions, hasSearchFilter, statusFilter, filterValue]);
+    // Добавляем сортировку для столбца "value" в порядке, указанном в sortDescriptor
+    filteredUsers.sort((a, b) => {
+      if (sortDescriptor.column === "value") {
+        const first = parseFloat(a["value"]);
+        const second = parseFloat(b["value"]);
+        const cmp = first < second ? -1 : first > second ? 1 : 0;
+        return sortDescriptor.direction === "descending" ? -cmp : cmp;
+      }
+      // Другие столбцы могут быть отсортированы по-разному, добавьте их обработку, если необходимо
+      return 0;
+    });
+
+    return filteredUsers;
+  }, [users, hasSearchFilter, statusFilter, filterValue, sortDescriptor]);
+
 
   const pages = Math.ceil(filteredItems.length / rowsPerPage);
 
@@ -124,16 +134,66 @@ export default function App() {
 
     return filteredItems.slice(start, end);
   }, [page, filteredItems, rowsPerPage]);
+  const [valueSortDirection, setValueSortDirection] = React.useState("ascending");
+  const [timeActiveSortDirection, setTimeActiveSortDirection] = React.useState("ascending");
+
+  const onSortChange = (newSortDescriptor) => {
+    if (newSortDescriptor.column === "value") {
+      if (sortDescriptor.column === "value") {
+        // Если текущий столбец сортировки - "value", инвертируем направление сортировки
+        setValueSortDirection(
+            valueSortDirection === "ascending" ? "descending" : "ascending"
+        );
+      } else {
+        // Если меняется столбец сортировки, устанавливаем направление по умолчанию (ascending)
+        setValueSortDirection("ascending");
+      }
+      setTimeActiveSortDirection("ascending"); // Сбрасываем направление сортировки для других столбцов
+    } else if (newSortDescriptor.column === "time_active") {
+      if (sortDescriptor.column === "time_active") {
+        // Если текущий столбец сортировки - "time_active", инвертируем направление сортировки
+        setTimeActiveSortDirection(
+            timeActiveSortDirection === "ascending" ? "descending" : "ascending"
+        );
+      } else {
+        // Если меняется столбец сортировки, устанавливаем направление по умолчанию (ascending)
+        setTimeActiveSortDirection("ascending");
+      }
+      setValueSortDirection("ascending"); // Сбрасываем направление сортировки для других столбцов
+    } else {
+      // Если меняется столбец сортировки, устанавливаем направление по умолчанию (ascending)
+      setSortDescriptor(newSortDescriptor);
+      setValueSortDirection("ascending"); // Сбрасываем направление сортировки для других столбцов
+      setTimeActiveSortDirection("ascending"); // Сбрасываем направление сортировки для других столбцов
+    }
+  };
+
+
+
 
   const sortedItems = React.useMemo(() => {
     return [...items].sort((a, b) => {
-      const first = a[sortDescriptor.column];
-      const second = b[sortDescriptor.column];
-      const cmp = first < second ? -1 : first > second ? 1 : 0;
-
-      return sortDescriptor.direction === "descending" ? -cmp : cmp;
+      if (sortDescriptor.column === "value") {
+        const first = parseFloat(a["value"]);
+        const second = parseFloat(b["value"]);
+        const cmp = first < second ? -1 : first > second ? 1 : 0;
+        return valueSortDirection === "descending" ? -cmp : cmp;
+      } else if (sortDescriptor.column === "time_active") {
+        const first = new Date(a["time_active"].start).getTime();
+        const second = new Date(b["time_active"].start).getTime();
+        const cmp = first < second ? -1 : first > second ? 1 : 0;
+        return timeActiveSortDirection === "descending" ? -cmp : cmp;
+      } else {
+        const first = a[sortDescriptor.column];
+        const second = b[sortDescriptor.column];
+        const cmp = first < second ? -1 : first > second ? 1 : 0;
+        return sortDescriptor.direction === "descending" ? -cmp : cmp;
+      }
     });
-  }, [sortDescriptor, items]);
+  }, [sortDescriptor, items, valueSortDirection, timeActiveSortDirection]);
+
+
+
 
   const renderCell = React.useCallback((user, columnKey) => {
     const cellValue = user[columnKey];
@@ -141,60 +201,46 @@ export default function App() {
     switch (columnKey) {
       case "id":
         return cellValue;
-      case "time":
+      case "name":
         return cellValue;
-      case "amount":
+      case "value":
+        return cellValue + "%";
+      case "sex":
+        return cellValue === "M" ? "Мужской" : "Женский";
+      case "age":
         return cellValue;
-      case "benefit":
+      case "time_active":
         return (
-          <div className="px-1 py-2">
-            <div className="text-small font-bold">
-              Размер: {cellValue.amount}
+            <div className="px-1 py-2">
+              <div className="text-small font-bold">
+                Активна до: {cellValue.end}
+              </div>
+              <div className="text-tiny">Активирована: {cellValue.start}</div>
             </div>
-            <div className="text-tiny">Тип: {cellValue.type}</div>
-          </div>
         );
-      case "coordinates":
-        return (
-          <div className="px-1 py-2">
-            <div className="text-small font-bold">Долгота: {cellValue.lat}</div>
-            <div className="text-tiny">Широта: {cellValue.lon}</div>
-          </div>
-        );
-      case "conductor":
-        return (
-          <User
-            description={"Смена "+cellValue.shift}
-            name={cellValue.first_name + " " + cellValue.middle_name + " " + cellValue.last_name}
-          >
-          </User>
-        );
-      case "city":
-        return cellValue.charAt(0).toUpperCase() + cellValue.slice(1);
-      case "state":
+      case "status":
         return (
           <Chip
             className="capitalize"
-            color={statusColorMap[cellValue]}
+            color={statusColorMap[user.status]}
             size="sm"
             variant="flat"
           >
             {cellValue}
           </Chip>
         );
-      case "card_id":
-        return cellValue;
+
       case "actions":
         return (
           <div className="relative flex items-center gap-2">
-            <Tooltip content="Изменить статус">
+            <Tooltip content="Изменить">
               <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
                 <EditIcon />
               </span>
             </Tooltip>
-            <Tooltip color="danger" content="Заблокировать">
+            <Tooltip color="danger" content="Удалить">
               <span className="text-lg text-danger cursor-pointer active:opacity-50">
-                <BlockIcon />
+                <DeleteIcon />
               </span>
             </Tooltip>
           </div>
@@ -242,7 +288,7 @@ export default function App() {
           <Input
             isClearable
             className="w-full sm:max-w-[44%]"
-            placeholder="Поиск по номеру карты..."
+            placeholder="Поиск по названию"
             startContent={<SearchIcon />}
             value={filterValue}
             onClear={() => onClear()}
@@ -297,11 +343,14 @@ export default function App() {
                 ))}
               </DropdownMenu>
             </Dropdown>
+            <Button color="primary" endContent={<PlusIcon />}>
+              Добавить
+            </Button>
           </div>
         </div>
         <div className="flex justify-between items-center">
           <span className="text-default-400 text-small">
-            Всего {transactions.length} транзакций
+            Всего скидок: {users.length}
           </span>
           <label className="flex items-center text-default-400 text-small">
             Количество строк:
@@ -322,7 +371,7 @@ export default function App() {
     onSearchChange,
     statusFilter,
     visibleColumns,
-    transactions.length,
+    users.length,
     onRowsPerPageChange,
     onClear,
   ]);
@@ -397,7 +446,7 @@ export default function App() {
           )}
         </TableHeader>
         <TableBody
-          emptyContent={"No transactions found"}
+          emptyContent={"No discounts found"}
           items={sortedItems}
           loadingContent={<Spinner />}
           loadingState={loadingState}

@@ -50,14 +50,9 @@ const statusColorMap = {
 
 const INITIAL_VISIBLE_COLUMNS = [
   "id",
-  "card_id",
   "card_number",
-  "time_active",
-  "last_activity",
-  "uID",
   "user",
   "status",
-  "actions",
 ];
 
 const fetcher = (...args) => fetch(...args).then((res) => res.json());
@@ -297,12 +292,6 @@ export default function App() {
                 ))}
               </DropdownMenu>
             </Dropdown>
-            <Button color="primary" endContent={<GetAppIcon />}>
-              Импорт
-            </Button>
-            <Button color="primary" endContent={<PublishIcon />}>
-              Экспорт
-            </Button>
           </div>
         </div>
         <div className="flex justify-between items-center">

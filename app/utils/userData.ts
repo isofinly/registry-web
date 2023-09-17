@@ -8,8 +8,8 @@ const columns = [
   { name: "Дата рождения", uid: "born", sortable: true },
   { name: "Город", uid: "city", sortable: true },
   { name: "Статус", uid: "account_states", sortable: true },
+  { name: "Скидка", uid: "discount" },
   { name: "ID карты", uid: "card_id",  },
-  { name: "Действия", uid: "actions"},
 ];
 
 const statusOptions = [

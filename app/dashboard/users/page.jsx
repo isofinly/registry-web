@@ -144,6 +144,8 @@ export default function App() {
     switch (columnKey) {
       case "id":
         return cellValue;
+      case "discount":
+        return cellValue+"%";
       case "first_name":
       case "last_name":
       case "middle_name":
@@ -176,37 +178,7 @@ export default function App() {
         );
       case "card_id":
         return user.card_id;
-      case "actions":
-        return (
-          <div className="relative flex items-center gap-2">
-            <Tooltip
-              content={
-                <div className="px-1 py-2">
-                  <div className="text-small font-bold">
-                    Последняя активность: {user.last_activity}
-                  </div>
-                  <div className="text-tiny">
-                    ID устройства: {user.deviceId}
-                  </div>
-                </div>
-              }
-            >
-              <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
-                <EyeIcon />
-              </span>
-            </Tooltip>
-            <Tooltip content="Изменить">
-              <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
-                <EditIcon />
-              </span>
-            </Tooltip>
-            <Tooltip color="danger" content="Удалить">
-              <span className="text-lg text-danger cursor-pointer active:opacity-50">
-                <DeleteIcon />
-              </span>
-            </Tooltip>
-          </div>
-        );
+
       default:
         return cellValue;
     }
@@ -305,9 +277,6 @@ export default function App() {
                 ))}
               </DropdownMenu>
             </Dropdown>
-            <Button color="primary" endContent={<PlusIcon />}>
-              Добавить
-            </Button>
           </div>
         </div>
         <div className="flex justify-between items-center">
