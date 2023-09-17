@@ -341,11 +341,6 @@ export default function App() {
   const bottomContent = React.useMemo(() => {
     return (
       <div className="py-2 px-2 flex justify-between items-center">
-        <span className="w-[30%] text-small text-default-400">
-          {selectedKeys === "all"
-            ? "Выбраны все пользователи"
-            : `${selectedKeys.size} из ${filteredItems.length} выбрано`}
-        </span>
         <Pagination
           isCompact
           showShadow
@@ -393,8 +388,8 @@ export default function App() {
         classNames={{
           wrapper: "max-h-[calc(95vh-200px)]",
         }}
-        selectedKeys={selectedKeys}
-        selectionMode="multiple"
+        // selectedKeys={selectedKeys}
+        // selectionMode="multiple"
         sortDescriptor={sortDescriptor}
         topContent={topContent}
         topContentPlacement="outside"
