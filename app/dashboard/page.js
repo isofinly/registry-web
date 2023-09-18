@@ -71,9 +71,9 @@ export default function Page() {
         <div className="grid grid-cols-3 gap-2 w-[70vw]">
           <Card className="py-4 w-fit col-span-1">
             <CardHeader className="pb-0 pt-2 px-4 flex-col items-start">
-              <p className="text-tiny uppercase font-bold">Пользователи</p>
+              <p className="text-tiny uppercase font-bold">Назначение скидки </p>
               <h4 className="font-bold text-large">
-                Регистрация/изменение данных
+                Добавить/убрать скидку пользователю
               </h4>
             </CardHeader>
             <Divider className="my-4" />
@@ -119,13 +119,14 @@ export default function Page() {
               </Button>
             </CardFooter>
           </Card>
+
           <Card className="py-4 w-fit col-span-1">
             <CardHeader className="pb-0 pt-2 px-4 flex-col items-start">
               <p className="text-tiny uppercase font-bold">
-                Управление картами
+                Скидка
               </p>
               <h4 className="font-bold text-large">
-                Выпуск/изменение/блокировка
+                Создание/удаление/редактирование
               </h4>
             </CardHeader>
             <Divider className="my-4" />
@@ -171,44 +172,47 @@ export default function Page() {
               </Button>
             </CardFooter>
           </Card>
+
           <Card className="py-4 w-fit col-span-1">
             <CardHeader className="pb-0 pt-2 px-4 flex-col items-start">
               <p className="text-tiny uppercase font-bold">
-                Социальные пособия
+                Создание целевых групп
               </p>
-              <h4 className="font-bold text-large">Детали/проценты/периоды</h4>
+              <h4 className="font-bold text-large">
+                Создание/удаление/редактирование целевых групп
+              </h4>
             </CardHeader>
             <Divider className="my-4" />
             <CardBody className="overflow-visible py-2">
               <Listbox
-                color="primary"
-                variant="flat"
-                aria-label="Actions"
-                onAction={(key) => alert(key)}
+                  color="primary"
+                  variant="flat"
+                  aria-label="Actions"
+                  onAction={(key) => alert(key)}
               >
                 <ListboxItem
-                  key="new"
-                  startContent={<AddNoteIcon className={iconClasses} />}
+                    key="new"
+                    startContent={<AddNoteIcon className={iconClasses} />}
                 >
                   New file
                 </ListboxItem>
                 <ListboxItem
-                  key="copy"
-                  startContent={<CopyDocumentIcon className={iconClasses} />}
+                    key="copy"
+                    startContent={<CopyDocumentIcon className={iconClasses} />}
                 >
                   Copy link
                 </ListboxItem>
                 <ListboxItem
-                  key="edit"
-                  startContent={<EditDocumentIcon className={iconClasses} />}
+                    key="edit"
+                    startContent={<EditDocumentIcon className={iconClasses} />}
                 >
                   Edit file
                 </ListboxItem>
                 <ListboxItem
-                  key="delete"
-                  className="text-danger"
-                  color="danger"
-                  startContent={<DeleteDocumentIcon className={iconClasses} />}
+                    key="delete"
+                    className="text-danger"
+                    color="danger"
+                    startContent={<DeleteDocumentIcon className={iconClasses} />}
                 >
                   Delete file
                 </ListboxItem>
@@ -221,6 +225,7 @@ export default function Page() {
               </Button>
             </CardFooter>
           </Card>
+
         </div>
       </div>
     </>

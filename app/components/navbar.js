@@ -71,12 +71,6 @@ export default function NavbarComponent() {
           </NavbarItem>
 
           <NavbarItem>
-            <Link color="foreground" href="/dashboard/transactions">
-              Транзакции
-            </Link>
-          </NavbarItem>
-
-          <NavbarItem>
             <Link color="foreground" href="/dashboard/cards">
               Карты
             </Link>
@@ -89,26 +83,21 @@ export default function NavbarComponent() {
           </NavbarItem>
 
           <NavbarItem>
-            <Link color="foreground" href="/dashboard/benefits">
-              Пособия/льготы
+            <Link color="foreground" href="/dashboard/discount">
+              Скидки
             </Link>
           </NavbarItem>
 
-          <NavbarItem>
-            <Link color="foreground" href="/dashboard/managment">
-              Управление
-            </Link>
-          </NavbarItem>
-
-          
         </NavbarContent>
 
         <Divider orientation="vertical" />
 
-        <NavbarContent justify="end">
-          <NavbarItem>{dateTime}</NavbarItem>
+        <NavbarContent className="h-full" justify="center">
+          <NavbarItem >{dateTime}</NavbarItem>
         </NavbarContent>
+
         <Divider orientation="vertical" />
+
         <NavbarContent justify="end">
           <NavbarItem>
             <Button variant="bordered" color="danger" radius="sm" onClick={() => signOut()}>
@@ -116,6 +105,7 @@ export default function NavbarComponent() {
             </Button>
           </NavbarItem>
         </NavbarContent>
+
       </Navbar>
 
       <Spacer y={2} />

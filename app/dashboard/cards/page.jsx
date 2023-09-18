@@ -49,15 +49,9 @@ const statusColorMap = {
 };
 
 const INITIAL_VISIBLE_COLUMNS = [
-  "id",
-  "card_id",
   "card_number",
-  "time_active",
-  "last_activity",
-  "uID",
   "user",
   "status",
-  "actions",
 ];
 
 const fetcher = (...args) => fetch(...args).then((res) => res.json());
@@ -75,7 +69,6 @@ export default function App() {
     direction: "ascending",
   });
   const [page, setPage] = React.useState(1);
-  const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
   const { data, isLoading } = useSWR(`/cards.json`, fetcher, {
     keepPreviousData: true,
@@ -110,7 +103,7 @@ export default function App() {
       Array.from(statusFilter).length !== statusOptions.length
     ) {
       filteredTransactions = filteredTransactions.filter((transaction) =>
-        Array.from(statusFilter).includes(transaction.state)
+        Array.from(statusFilter).includes(transaction.status)
       );
     }
 
@@ -144,23 +137,6 @@ export default function App() {
         return cellValue;
       case "card_number":
         return cellValue;
-      case "amount":
-        return cellValue;
-      case "time_active":
-        return (
-          <div className="px-1 py-2">
-            <div className="text-small font-bold">
-              Активна до: {cellValue.end}
-            </div>
-            <div className="text-tiny">Активирована: {cellValue.start}</div>
-          </div>
-        );
-      case "last_activity":
-        return (
-          <div className="px-1 py-2">
-            <div className="text-small font-bold">{cellValue}</div>
-          </div>
-        );
       case "user":
         return (
           <User
@@ -169,8 +145,6 @@ export default function App() {
           >
           </User>
         );
-      case "uID":
-        return cellValue;
       case "status":
         return (
           <Chip
@@ -181,23 +155,6 @@ export default function App() {
           >
             {cellValue}
           </Chip>
-        );
-      case "card_id":
-        return cellValue;
-      case "actions":
-        return (
-          <div className="relative flex items-center gap-2">
-            <Tooltip content="Изменить статус">
-              <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
-                <EditIcon />
-              </span>
-            </Tooltip>
-            <Tooltip color="danger" content="Заблокировать">
-              <span className="text-lg text-danger cursor-pointer active:opacity-50">
-                <BlockIcon />
-              </span>
-            </Tooltip>
-          </div>
         );
       default:
         return cellValue;
@@ -241,7 +198,7 @@ export default function App() {
         <div className="flex justify-between gap-3 items-end">
           <Input
             isClearable
-            className="w-full sm:max-w-[44%]"
+            className="w-full sm:max-w-[50%]"
             placeholder="Поиск по номеру карты..."
             startContent={<SearchIcon />}
             value={filterValue}
@@ -252,24 +209,24 @@ export default function App() {
             <Dropdown>
               <DropdownTrigger className="hidden sm:flex">
                 <Button
-                  endContent={<ChevronDownIcon className="text-small" />}
-                  variant="flat"
+                    endContent={<ChevronDownIcon className="text-small" />}
+                    variant="flat"
                 >
                   Статус
                 </Button>
               </DropdownTrigger>
               <DropdownMenu
-                disallowEmptySelection
-                aria-label="Table Columns"
-                closeOnSelect={false}
-                selectedKeys={statusFilter}
-                selectionMode="multiple"
-                onSelectionChange={setStatusFilter}
+                  disallowEmptySelection
+                  aria-label="Table Columns"
+                  closeOnSelect={false}
+                  selectedKeys={statusFilter}
+                  selectionMode="multiple"
+                  onSelectionChange={setStatusFilter}
               >
                 {statusOptions.map((status) => (
-                  <DropdownItem key={status.uid} className="capitalize">
-                    {capitalize(status.name)}
-                  </DropdownItem>
+                    <DropdownItem key={status.uid} className="capitalize">
+                      {capitalize(status.name)}
+                    </DropdownItem>
                 ))}
               </DropdownMenu>
             </Dropdown>
@@ -297,12 +254,6 @@ export default function App() {
                 ))}
               </DropdownMenu>
             </Dropdown>
-            <Button color="primary" endContent={<GetAppIcon />}>
-              Импорт
-            </Button>
-            <Button color="primary" endContent={<PublishIcon />}>
-              Экспорт
-            </Button>
           </div>
         </div>
         <div className="flex justify-between items-center">
