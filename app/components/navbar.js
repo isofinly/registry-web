@@ -58,7 +58,7 @@ export default function NavbarComponent() {
       <Navbar isBordered>
         <NavbarBrand className="h-full" justify="center">
           <Logo className="h-full" />
-          <p className="font-bold text-[#f05c27]">ЕКЖ</p>
+          <p className="font-bold text-[#f05c27]">ЕКЖ Партнеры</p>
         </NavbarBrand>
 
         <Divider orientation="vertical" />
