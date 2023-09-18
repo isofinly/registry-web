@@ -75,8 +75,6 @@ export default function App() {
     direction: "ascending",
   });
   const [page, setPage] = React.useState(1);
-  const { isOpen, onOpen, onOpenChange } = useDisclosure();
-
   const { data, isLoading } = useSWR(`/users.json`, fetcher, {
     keepPreviousData: true,
   });

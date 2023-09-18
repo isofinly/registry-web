@@ -2,7 +2,6 @@
 import React from "react";
 import { EditIcon } from "../../components/icons";
 import { DeleteIcon } from "../../components/icons";
-import { EyeIcon } from "../../components/icons";
 import { PlusIcon } from "../../components/icons";
 import { ChevronDownIcon } from "../../components/icons";
 import { SearchIcon } from "../../components/icons";
@@ -25,22 +24,9 @@ import {
   DropdownMenu,
   DropdownItem,
   Chip,
-  User,
   Pagination,
-  Selection,
-  ChipProps,
   Tooltip,
-  SortDescriptor,
   Spinner,
-} from "@nextui-org/react";
-
-import {
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  useDisclosure,
 } from "@nextui-org/react";
 
 const statusColorMap = {
@@ -71,7 +57,6 @@ export default function App() {
     direction: "ascending",
   });
   const [page, setPage] = React.useState(1);
-  const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
   const { data, isLoading } = useSWR(`/discount.json`, fetcher, {
     keepPreviousData: true,
@@ -106,7 +91,7 @@ export default function App() {
         Array.from(statusFilter).length !== statusOptions.length
     ) {
       filteredUsers = filteredUsers.filter((user) =>
-          Array.from(statusFilter).includes(user.account_states)
+          Array.from(statusFilter).includes(user.status)
       );
     }
 
@@ -128,70 +113,23 @@ export default function App() {
 
   const pages = Math.ceil(filteredItems.length / rowsPerPage);
 
+
   const items = React.useMemo(() => {
     const start = (page - 1) * rowsPerPage;
     const end = start + rowsPerPage;
 
     return filteredItems.slice(start, end);
   }, [page, filteredItems, rowsPerPage]);
-  const [valueSortDirection, setValueSortDirection] = React.useState("ascending");
-  const [timeActiveSortDirection, setTimeActiveSortDirection] = React.useState("ascending");
-
-  const onSortChange = (newSortDescriptor) => {
-    if (newSortDescriptor.column === "value") {
-      if (sortDescriptor.column === "value") {
-        // Если текущий столбец сортировки - "value", инвертируем направление сортировки
-        setValueSortDirection(
-            valueSortDirection === "ascending" ? "descending" : "ascending"
-        );
-      } else {
-        // Если меняется столбец сортировки, устанавливаем направление по умолчанию (ascending)
-        setValueSortDirection("ascending");
-      }
-      setTimeActiveSortDirection("ascending"); // Сбрасываем направление сортировки для других столбцов
-    } else if (newSortDescriptor.column === "time_active") {
-      if (sortDescriptor.column === "time_active") {
-        // Если текущий столбец сортировки - "time_active", инвертируем направление сортировки
-        setTimeActiveSortDirection(
-            timeActiveSortDirection === "ascending" ? "descending" : "ascending"
-        );
-      } else {
-        // Если меняется столбец сортировки, устанавливаем направление по умолчанию (ascending)
-        setTimeActiveSortDirection("ascending");
-      }
-      setValueSortDirection("ascending"); // Сбрасываем направление сортировки для других столбцов
-    } else {
-      // Если меняется столбец сортировки, устанавливаем направление по умолчанию (ascending)
-      setSortDescriptor(newSortDescriptor);
-      setValueSortDirection("ascending"); // Сбрасываем направление сортировки для других столбцов
-      setTimeActiveSortDirection("ascending"); // Сбрасываем направление сортировки для других столбцов
-    }
-  };
-
-
-
 
   const sortedItems = React.useMemo(() => {
     return [...items].sort((a, b) => {
-      if (sortDescriptor.column === "value") {
-        const first = parseFloat(a["value"]);
-        const second = parseFloat(b["value"]);
-        const cmp = first < second ? -1 : first > second ? 1 : 0;
-        return valueSortDirection === "descending" ? -cmp : cmp;
-      } else if (sortDescriptor.column === "time_active") {
-        const first = new Date(a["time_active"].start).getTime();
-        const second = new Date(b["time_active"].start).getTime();
-        const cmp = first < second ? -1 : first > second ? 1 : 0;
-        return timeActiveSortDirection === "descending" ? -cmp : cmp;
-      } else {
-        const first = a[sortDescriptor.column];
-        const second = b[sortDescriptor.column];
-        const cmp = first < second ? -1 : first > second ? 1 : 0;
-        return sortDescriptor.direction === "descending" ? -cmp : cmp;
-      }
-    });
-  }, [sortDescriptor, items, valueSortDirection, timeActiveSortDirection]);
+      const first = a[sortDescriptor.column];
+      const second = b[sortDescriptor.column];
+      const cmp = first < second ? -1 : first > second ? 1 : 0;
 
+      return sortDescriptor.direction === "descending" ? -cmp : cmp;
+    });
+  }, [sortDescriptor, items]);
 
 
 
