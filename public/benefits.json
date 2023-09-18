@@ -1,0 +1,49 @@
+{
+  "results": [
+    {
+      "id": 1,
+      "amount": 12,
+      "card_data": [
+        { "card_number": 1234567890123456, "card_id": 1 },
+        { "card_number": 1234567890123456, "card_id": 12 },
+        { "card_number": 1234567890123456, "card_id": 13 },
+        { "card_number": 1234567890123456, "card_id": 14 }
+      ],
+      "time": {
+        "active_since": "2022-01-15",
+        "active_until": "2022-03-15"
+      },
+      "state": "active",
+      "name": "John Doe",
+      "info": "Customer since 2021"
+    },
+    {
+      "id": 2,
+      "amount": 24,
+      "card_data": [
+        { "card_number": 9876543210987654, "card_id": 21 },
+        { "card_number": 9876543210987654, "card_id": 22 },
+        { "card_number": 9876543210987654, "card_id": 23 }
+      ],
+      "time": {
+        "active_since": "2022-04-20",
+        "active_until": "2022-06-20"
+      },
+      "state": "active",
+      "name": "Jane Smith",
+      "info": "Customer since 2020"
+    },
+    {
+      "id": 3,
+      "amount": 8,
+      "card_data": [{ "card_number": 5555555555555555, "card_id": 33 }],
+      "time": {
+        "active_since": "2022-02-10",
+        "active_until": "2022-04-10"
+      },
+      "state": "inactive",
+      "name": "Alice Johnson",
+      "info": "Customer since 2019"
+    }
+  ]
+}

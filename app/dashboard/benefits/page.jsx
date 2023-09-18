@@ -6,7 +6,7 @@ import { EyeIcon } from "../../components/icons";
 import { PlusIcon } from "../../components/icons";
 import { ChevronDownIcon } from "../../components/icons";
 import { SearchIcon } from "../../components/icons";
-import { columns, statusOptions } from "../../utils/userData";
+import { columns, statusOptions } from "../../utils/benefitData";
 import { capitalize } from "../../utils/utils";
 
 import useSWR from "swr";
@@ -25,18 +25,20 @@ import {
   DropdownMenu,
   DropdownItem,
   Chip,
-  User,
+  benefit,
   Pagination,
   Selection,
   ChipProps,
   Tooltip,
   SortDescriptor,
   Spinner,
+  getKeyValue,
+  ButtonGroup,
 } from "@nextui-org/react";
 
 import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
 import EditIcon from "@mui/icons-material/Edit";
-import InfoIcon from '@mui/icons-material/Info';
+import InfoIcon from "@mui/icons-material/Info";
 
 import {
   Modal,
@@ -49,18 +51,16 @@ import {
 
 const statusColorMap = {
   active: "success",
-  paused: "danger",
+  blocked: "danger",
   suspended: "warning",
 };
 
 const INITIAL_VISIBLE_COLUMNS = [
-  "first_name",
-  "middle_name",
-  "last_name",
-  "born",
-  "city",
-  "card_id",
-  "account_states",
+  "name",
+  "amount",
+  "card_data",
+  "time",
+  "state",
   "actions",
 ];
 
@@ -81,14 +81,14 @@ export default function App() {
   const [page, setPage] = React.useState(1);
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
-  const { data, isLoading } = useSWR(`/users.json`, fetcher, {
+  const { data, isLoading } = useSWR(`/benefits.json`, fetcher, {
     keepPreviousData: true,
   });
 
   const loadingState =
     isLoading || data?.results.length === 0 ? "Загрузка" : "Неактивен";
 
-  const users = React.useMemo(() => data?.results || [], [data]);
+  const benefits = React.useMemo(() => data?.results || [], [data]);
 
   const hasSearchFilter = Boolean(filterValue);
 
@@ -101,27 +101,29 @@ export default function App() {
   }, [visibleColumns]);
 
   const filteredItems = React.useMemo(() => {
-    let filteredUsers = [...users];
+    let filteredbenefits = [...benefits];
 
     if (hasSearchFilter) {
-      filteredUsers = filteredUsers.filter(
-        (user) =>
-          user.first_name.toLowerCase().includes(filterValue.toLowerCase()) ||
-          user.last_name.toLowerCase().includes(filterValue.toLowerCase()) ||
-          user.middle_name.toLowerCase().includes(filterValue.toLowerCase())
+      filteredbenefits = filteredbenefits.filter(
+        (benefit) =>
+          benefit.first_name
+            .toLowerCase()
+            .includes(filterValue.toLowerCase()) ||
+          benefit.last_name.toLowerCase().includes(filterValue.toLowerCase()) ||
+          benefit.middle_name.toLowerCase().includes(filterValue.toLowerCase())
       );
     }
     if (
       statusFilter !== "all" &&
       Array.from(statusFilter).length !== statusOptions.length
     ) {
-      filteredUsers = filteredUsers.filter((user) =>
-        Array.from(statusFilter).includes(user.account_states)
+      filteredbenefits = filteredbenefits.filter((benefit) =>
+        Array.from(statusFilter).includes(benefit.state)
       );
     }
 
-    return filteredUsers;
-  }, [users, hasSearchFilter, statusFilter, filterValue]);
+    return filteredbenefits;
+  }, [benefits, hasSearchFilter, statusFilter, filterValue]);
 
   const pages = Math.ceil(filteredItems.length / rowsPerPage);
 
@@ -142,46 +144,47 @@ export default function App() {
     });
   }, [sortDescriptor, items]);
 
-  const renderCell = React.useCallback((user, columnKey) => {
-    const cellValue = user[columnKey];
+  const [cardsList, setCardsList] = React.useState(new Set([]));
+
+  const renderCell = React.useCallback((benefit, columnKey) => {
+    const cellValue = benefit[columnKey];
 
     switch (columnKey) {
       case "id":
+      case "amount":
+      case "name":
         return cellValue;
-      case "first_name":
-      case "last_name":
-      case "middle_name":
-        return cellValue
-      case "sex":
-        return cellValue === "M" ? "Мужской" : "Женский";
-      case "email":
+      case "card_data":
         return (
-          <User
-            description={user.email}
-            name={user.first_name + " " + user.last_name}
-          >
-            {user.email}
-          </User>
+          <>
+            <Button color="primary" onPress={() => setCardsList(cellValue)}>
+              Список карт
+            </Button>
+          </>
         );
-      case "born":
-        return new Date(cellValue).toLocaleDateString();
-      case "city":
-        return cellValue.charAt(0).toUpperCase() + cellValue.slice(1);
-      case "account_states":
+      case "time":
+        return (
+          <div className="px-1 py-2">
+            <div className="text-small font-bold">
+              Активна до:{" "}
+              {new Date(cellValue.active_until).toLocaleDateString()}
+            </div>
+            <div className="text-tiny">
+              Активна с: {new Date(cellValue.active_since).toLocaleDateString()}
+            </div>
+          </div>
+        );
+      case "state":
         return (
           <Chip
             className="capitalize"
-            color={statusColorMap[user.account_states]}
+            color={statusColorMap[benefit.state]}
             size="sm"
             variant="flat"
           >
             {cellValue}
           </Chip>
         );
-      case "card_id":
-        return user.card_id;
-      case "snils":
-        return cellValue
       case "actions":
         return (
           <div className="relative flex items-center gap-2">
@@ -189,11 +192,9 @@ export default function App() {
               content={
                 <div className="px-1 py-2">
                   <div className="text-small font-bold">
-                    Последняя активность: {user.last_activity}
+                    Дополнительная информация:
                   </div>
-                  <div className="text-tiny">
-                    ID устройства: {user.deviceId}
-                  </div>
+                  <div className="text-tiny">{benefit.info}</div>
                 </div>
               }
             >
@@ -318,7 +319,7 @@ export default function App() {
         </div>
         <div className="flex justify-between items-center">
           <span className="text-default-400 text-small">
-            Всего {users.length} пользователей
+            Всего {benefits.length} пользователей
           </span>
           <label className="flex items-center text-default-400 text-small">
             Количество строк:
@@ -339,7 +340,7 @@ export default function App() {
     onSearchChange,
     statusFilter,
     visibleColumns,
-    users.length,
+    benefits.length,
     onRowsPerPageChange,
     onClear,
   ]);
@@ -356,22 +357,24 @@ export default function App() {
           onChange={setPage}
         />
         <div className="hidden sm:flex w-[30%] justify-end gap-2">
-          <Button
-            isDisabled={pages === 1}
-            size="sm"
-            variant="flat"
-            onPress={onPreviousPage}
-          >
-            Назад
-          </Button>
-          <Button
-            isDisabled={pages === 1}
-            size="sm"
-            variant="flat"
-            onPress={onNextPage}
-          >
-            Вперед
-          </Button>
+          <ButtonGroup>
+            <Button
+              isDisabled={pages === 1}
+              size="sm"
+              variant="flat"
+              onPress={onPreviousPage}
+            >
+              Назад
+            </Button>
+            <Button
+              isDisabled={pages === 1}
+              size="sm"
+              variant="flat"
+              onPress={onNextPage}
+            >
+              Вперед
+            </Button>
+          </ButtonGroup>
         </div>
       </div>
     );
@@ -384,9 +387,35 @@ export default function App() {
     onNextPage,
   ]);
 
+  let globalVariable;
+
+  const [cardPage, setCardPage] = React.useState(1);
+  const rowsPerCardPage = 20;
+
+  const cards = React.useMemo(() => {
+    let cardPages = cardsList
+      ? Math.ceil(cardsList.length / rowsPerCardPage)
+      : 1;
+    const start = (cardPage - 1) * rowsPerCardPage;
+    const end = start + rowsPerCardPage;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    globalVariable = cardPages;
+    if (cardsList && cardsList.length > 0) {
+      return cardsList.slice(start, end);
+    } else {
+      return []; // Return an empty array or any other default value
+    }
+  }, [cardsList, cardPage]);
+
+  const renderCardCell = React.useCallback((benefit, columnKey) => {
+    return benefit[columnKey];
+  }, []);
+
   return (
-    <div className="">
+    // <div className="flex justify-items-center justify-center">
+    <div className="flex justify-center grid-flow-row-dense grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-2 ">
       <Table
+        className="col-span-1"
         aria-label="Example table with custom cells, pagination and sorting"
         isHeaderSticky
         bottomContent={bottomContent}
@@ -414,7 +443,7 @@ export default function App() {
           )}
         </TableHeader>
         <TableBody
-          emptyContent={"No users found"}
+          emptyContent={"No benefits found"}
           items={sortedItems}
           loadingContent={<Spinner />}
           loadingState={loadingState}
@@ -428,6 +457,41 @@ export default function App() {
           )}
         </TableBody>
       </Table>
+
+      <Table
+        className="col-span-1"
+        aria-label="cards data table"
+        bottomContent={
+          <div className="flex w-full justify-center">
+            <Pagination
+              isCompact
+              showShadow
+              color="primary"
+              page={cardPage}
+              total={globalVariable}
+              onChange={(page) => setCardPage(page)}
+            />
+          </div>
+        }
+        classNames={{
+          wrapper: "min-h-[222px]",
+        }}
+      >
+        <TableHeader>
+          <TableColumn key="card_number">Номер</TableColumn>
+          <TableColumn key="card_id">ID</TableColumn>
+        </TableHeader>
+        <TableBody items={cards}>
+          {(item) => (
+            <TableRow key={item.card_id}>
+              {(columnKey) => (
+                <TableCell>{renderCardCell(item, columnKey)}</TableCell>
+              )}
+            </TableRow>
+          )}
+        </TableBody>
+      </Table>
     </div>
+    // </div>
   );
 }
