@@ -267,24 +267,30 @@ export default function Page() {
             </CardHeader>
             <Divider className="my-4" />
             <CardBody className="overflow-visible py-2">
-              <Listbox color="primary" variant="flat" aria-label="Actions">
+              <p className="text-tiny uppercase font-bold">Возможности</p>
+              <Listbox
+                color="primary"
+                variant="flat"
+                aria-label="Actions"
+                disableAnimation={true}
+              >
                 <ListboxItem
                   key="new"
                   startContent={<AddIcon className={iconClasses} />}
                 >
-                  New user
+                  Добавление
                 </ListboxItem>
                 <ListboxItem
                   key="copy"
                   startContent={<ChangeCircleIcon className={iconClasses} />}
                 >
-                  Change user status
+                  Изменение статуса
                 </ListboxItem>
                 <ListboxItem
                   key="edit"
                   startContent={<EditIcon className={iconClasses} />}
                 >
-                  Edit user
+                  Изменение полей
                 </ListboxItem>
                 <ListboxItem
                   key="ban"
@@ -294,7 +300,7 @@ export default function Page() {
                     <RemoveCircleOutlineIcon className={iconClasses} />
                   }
                 >
-                  Ban user
+                  Блокировка
                 </ListboxItem>
                 <ListboxItem
                   key="delete"
@@ -302,7 +308,7 @@ export default function Page() {
                   color="danger"
                   startContent={<RemoveIcon className={iconClasses} />}
                 >
-                  Delete user
+                  Удаление
                 </ListboxItem>
               </Listbox>
             </CardBody>
@@ -335,7 +341,7 @@ export default function Page() {
                   {(onClose) => (
                     <>
                       <ModalHeader className="flex flex-col gap-1">
-                        Users
+                        Пользователи
                       </ModalHeader>
                       <ModalBody>
                         <Tabs
@@ -345,7 +351,7 @@ export default function Page() {
                           selectedKey={selected}
                           onSelectionChange={setSelected}
                         >
-                          <Tab key="state-change" title="State change">
+                          <Tab key="state-change" title="Изменеие статуса">
                             <div className="flex flex-col gap-4 h-[300px]">
                               <Autocomplete
                                 id="user-input"
@@ -469,7 +475,7 @@ export default function Page() {
                               </div>
                             </div>
                           </Tab>
-                          <Tab key="new-user" title="User register">
+                          <Tab key="new-user" title="Регистрация">
                             <div className="flex flex-col gap-4">
                               <Input
                                 isRequired
@@ -538,7 +544,7 @@ export default function Page() {
                                 }}
                                 PopperComponent={StyledPopper}
                                 ListboxComponent={ListboxComponent}
-                                options={statusOptions.map(
+                                options={userStatus.map(
                                   (status) => "Статус: " + status.name
                                 )}
                                 // groupBy={(option) => option[0].toUpperCase()}
@@ -599,7 +605,7 @@ export default function Page() {
                             </div>
                           </Tab>
 
-                          <Tab key="edit-user" title="Edit user">
+                          <Tab key="edit-user" title="Изменение данных">
                             <div className="flex flex-col gap-4 h-[300px]">
                               <Autocomplete
                                 id="user-input"
@@ -726,7 +732,7 @@ export default function Page() {
                                 }}
                                 PopperComponent={StyledPopper}
                                 ListboxComponent={ListboxComponent}
-                                options={statusOptions.map(
+                                options={userStatus.map(
                                   (status) => "Статус: " + status.name
                                 )}
                                 // groupBy={(option) => option[0].toUpperCase()}
@@ -787,7 +793,7 @@ export default function Page() {
                               </div>
                             </div>
                           </Tab>
-                          <Tab key="ban-user" title="Ban user">
+                          <Tab key="ban-user" title="Блокировка">
                             <div className="flex flex-col gap-4 h-[300px]">
                               <Autocomplete
                                 id="user-input"
@@ -861,7 +867,7 @@ export default function Page() {
                               </div>
                             </div>
                           </Tab>
-                          <Tab key="delete-user" title="Delete user">
+                          <Tab key="delete-user" title="Удаление">
                             <div className="flex flex-col gap-4 h-[300px]">
                               <Autocomplete
                                 id="user-input"
@@ -971,24 +977,25 @@ export default function Page() {
             </CardHeader>
             <Divider className="my-4" />
             <CardBody className="overflow-visible py-2">
+              <p className="text-tiny uppercase font-bold">Возможности</p>
               <Listbox color="primary" variant="flat" aria-label="Actions">
                 <ListboxItem
                   key="new"
                   startContent={<AddIcon className={iconClasses} />}
                 >
-                  New card
+                  Добавление
                 </ListboxItem>
                 <ListboxItem
                   key="copy"
                   startContent={<ChangeCircleIcon className={iconClasses} />}
                 >
-                  Change status
+                  Изменение статус
                 </ListboxItem>
                 <ListboxItem
                   key="edit"
                   startContent={<EditIcon className={iconClasses} />}
                 >
-                  Edit card
+                  Изменение данные
                 </ListboxItem>
                 <ListboxItem
                   key="ban"
@@ -998,7 +1005,7 @@ export default function Page() {
                     <RemoveCircleOutlineIcon className={iconClasses} />
                   }
                 >
-                  Ban card
+                  Блокировка
                 </ListboxItem>
                 <ListboxItem
                   key="delete"
@@ -1006,7 +1013,7 @@ export default function Page() {
                   color="danger"
                   startContent={<RemoveIcon className={iconClasses} />}
                 >
-                  Delete card
+                  Удаление
                 </ListboxItem>
               </Listbox>
             </CardBody>
@@ -1039,7 +1046,7 @@ export default function Page() {
                   {(onClose) => (
                     <>
                       <ModalHeader className="flex flex-col gap-1">
-                        Cards
+                        Карты
                       </ModalHeader>
                       <ModalBody>
                         <Tabs
@@ -1049,7 +1056,7 @@ export default function Page() {
                           selectedKey={selected}
                           onSelectionChange={setSelected}
                         >
-                          <Tab key="state-change" title="State change">
+                          <Tab key="state-change" title="Изменение статуса">
                             <div className="flex flex-col gap-4 h-[300px]">
                               <Autocomplete
                                 id="card-input"
@@ -1169,7 +1176,7 @@ export default function Page() {
                               </div>
                             </div>
                           </Tab>
-                          <Tab key="new-card" title="Card register">
+                          <Tab key="new-card" title="Регистрация">
                             <div className="flex flex-col gap-4">
                               <Input
                                 isRequired
@@ -1253,7 +1260,7 @@ export default function Page() {
                               </div>
                             </div>
                           </Tab>
-                          <Tab key="edit-user" title="Edit card">
+                          <Tab key="edit-user" title="Изменение данных">
                             <div className="flex flex-col gap-4 h-[300px]">
                               <Autocomplete
                                 id="card-input"
@@ -1389,7 +1396,7 @@ export default function Page() {
                               </div>
                             </div>
                           </Tab>
-                          <Tab key="ban-card" title="Ban card">
+                          <Tab key="ban-card" title="Блокировка">
                             <div className="flex flex-col gap-4 h-[300px]">
                               <Autocomplete
                                 id="card-input"
@@ -1456,7 +1463,7 @@ export default function Page() {
                               </div>
                             </div>
                           </Tab>
-                          <Tab key="delete-user" title="Delete user">
+                          <Tab key="delete-user" title="Удаление">
                             <div className="flex flex-col gap-4 h-[300px]">
                               <Autocomplete
                                 id="card-input"
@@ -1559,12 +1566,13 @@ export default function Page() {
             </CardHeader>
             <Divider className="my-4" />
             <CardBody className="overflow-visible py-2">
+              <p className="text-tiny uppercase font-bold">Возможности</p>
               <Listbox color="primary" variant="flat" aria-label="Actions">
                 <ListboxItem
                   key="copy"
                   startContent={<ChangeCircleIcon className={iconClasses} />}
                 >
-                  Change status
+                  Изменить статус
                 </ListboxItem>
                 <ListboxItem
                   key="delete"
@@ -1572,7 +1580,7 @@ export default function Page() {
                   color="danger"
                   startContent={<RemoveIcon className={iconClasses} />}
                 >
-                  Delete transaction
+                  Удаление
                 </ListboxItem>
               </Listbox>
             </CardBody>
@@ -1607,7 +1615,7 @@ export default function Page() {
                   {(onClose) => (
                     <>
                       <ModalHeader className="flex flex-col gap-1">
-                        Transaction
+                        Транзакция
                       </ModalHeader>
                       <ModalBody>
                         <Tabs
@@ -1619,7 +1627,7 @@ export default function Page() {
                         >
                           <Tab
                             key="transaction-state-change"
-                            title="State change"
+                            title="Изменение статуса"
                           >
                             <div className="flex flex-col gap-4 h-[300px]">
                               <Autocomplete
@@ -1740,10 +1748,7 @@ export default function Page() {
                               </div>
                             </div>
                           </Tab>
-                          <Tab
-                            key="transaction-user"
-                            title="Delete transaction"
-                          >
+                          <Tab key="transaction-user" title="Удаление">
                             <div className="flex flex-col gap-4 h-[300px]">
                               <Autocomplete
                                 id="transaction-input"
@@ -1849,18 +1854,25 @@ export default function Page() {
             </CardHeader>
             <Divider className="my-4" />
             <CardBody className="overflow-visible py-2">
+              <p className="text-tiny uppercase font-bold">Возможности</p>
               <Listbox color="primary" variant="flat" aria-label="Actions">
                 <ListboxItem
                   key="new"
                   startContent={<AddIcon className={iconClasses} />}
                 >
-                  New benefit
+                  Добавление
                 </ListboxItem>
                 <ListboxItem
                   key="edit"
                   startContent={<EditIcon className={iconClasses} />}
                 >
-                  Edit benefits
+                  Изменение данных
+                </ListboxItem>
+                <ListboxItem
+                  key="edit"
+                  startContent={<ChangeCircleIcon className={iconClasses} />}
+                >
+                  Изменение статуса
                 </ListboxItem>
                 <ListboxItem
                   key="delete"
@@ -1868,7 +1880,7 @@ export default function Page() {
                   color="danger"
                   startContent={<RemoveIcon className={iconClasses} />}
                 >
-                  Delete benefits
+                  Удаление
                 </ListboxItem>
               </Listbox>
             </CardBody>
@@ -1879,7 +1891,7 @@ export default function Page() {
                   color="primary"
                   onPress={() => (window.location.href = `/dashboard/benefits`)}
                 >
-                  Все пособия
+                  Все льготы
                 </Button>
                 <Button
                   variant="flat"
@@ -1901,7 +1913,7 @@ export default function Page() {
                   {(onClose) => (
                     <>
                       <ModalHeader className="flex flex-col gap-1">
-                        Benefits
+                        Льготы
                       </ModalHeader>
                       <ModalBody>
                         <Tabs
@@ -1911,7 +1923,7 @@ export default function Page() {
                           selectedKey={selected}
                           onSelectionChange={setSelected}
                         >
-                          <Tab key="new-user" title="User register">
+                          <Tab key="new-benefit" title="Добавление">
                             <div className="flex flex-col gap-4">
                               <Input
                                 isRequired
@@ -1933,7 +1945,7 @@ export default function Page() {
                               </div>
                             </div>
                           </Tab>
-                          <Tab key="state-change" title="State change">
+                          <Tab key="benefit-state-change" title="Изменение статуса">
                             <div className="flex flex-col gap-4 h-[300px]">
                               <Input
                                 isRequired
@@ -1961,7 +1973,7 @@ export default function Page() {
                               </div>
                             </div>
                           </Tab>
-                          <Tab key="edit-user" title="Edit user">
+                          <Tab key="edit-benefit" title="Изменение данных">
                             <div className="flex flex-col gap-4 h-[300px]">
                               <Input
                                 isRequired
@@ -1989,35 +2001,7 @@ export default function Page() {
                               </div>
                             </div>
                           </Tab>
-                          <Tab key="ban-user" title="Ban user">
-                            <div className="flex flex-col gap-4 h-[300px]">
-                              <Input
-                                isRequired
-                                label="Name"
-                                placeholder="Enter your name"
-                                type="password"
-                              />
-                              <Input
-                                isRequired
-                                label="Email"
-                                placeholder="Enter your email"
-                                type="email"
-                              />
-                              <Input
-                                isRequired
-                                label="Password"
-                                placeholder="Enter your password"
-                                type="password"
-                              />
-
-                              <div className="flex gap-2 justify-end">
-                                <Button fullWidth color="primary">
-                                  Sign up
-                                </Button>
-                              </div>
-                            </div>
-                          </Tab>
-                          <Tab key="delete-user" title="Delete user">
+                          <Tab key="delete-benefit" title="Удаление">
                             <div className="flex flex-col gap-4 h-[300px]">
                               <Input
                                 isRequired
@@ -2070,7 +2054,7 @@ export default function Page() {
           <Card
             isPressable
             disableRipple={true}
-            onPress={() => onTransactionOpen()}
+            onPress={() => onRegistryOpen()}
             className="py-4 min-w-[300px] col-span-1"
           >
             <CardHeader className="pb-0 pt-2 px-4 flex-col items-start">
@@ -2079,18 +2063,19 @@ export default function Page() {
             </CardHeader>
             <Divider className="my-4" />
             <CardBody className="overflow-visible py-2">
+              <p className="text-tiny uppercase font-bold">Возможности</p>
               <Listbox color="primary" variant="flat" aria-label="Actions">
                 <ListboxItem
                   key="copy"
                   startContent={<ChangeCircleIcon className={iconClasses} />}
                 >
-                  Update
+                  Обновление
                 </ListboxItem>
                 <ListboxItem
                   key="edit"
                   startContent={<InfoIcon className={iconClasses} />}
                 >
-                  Show details
+                  Детализация
                 </ListboxItem>
                 <ListboxItem
                   key="delete"
@@ -2098,7 +2083,7 @@ export default function Page() {
                   color="danger"
                   startContent={<RemoveIcon className={iconClasses} />}
                 >
-                  Delete registry
+                  Удаление
                 </ListboxItem>
               </Listbox>
             </CardBody>
@@ -2125,7 +2110,7 @@ export default function Page() {
                   {(onClose) => (
                     <>
                       <ModalHeader className="flex flex-col gap-1">
-                        Transaction
+                        Реестры
                       </ModalHeader>
                       <ModalBody>
                         <Tabs
@@ -2135,7 +2120,7 @@ export default function Page() {
                           selectedKey={selected}
                           onSelectionChange={setSelected}
                         >
-                          <Tab key="new-user" title="User register">
+                          <Tab key="registry-update" title="Обновление">
                             <div className="flex flex-col gap-4">
                               <Input
                                 isRequired
@@ -2157,7 +2142,7 @@ export default function Page() {
                               </div>
                             </div>
                           </Tab>
-                          <Tab key="state-change" title="State change">
+                          <Tab key="registry-info" title="Информация">
                             <div className="flex flex-col gap-4 h-[300px]">
                               <Input
                                 isRequired
@@ -2185,63 +2170,7 @@ export default function Page() {
                               </div>
                             </div>
                           </Tab>
-                          <Tab key="edit-user" title="Edit user">
-                            <div className="flex flex-col gap-4 h-[300px]">
-                              <Input
-                                isRequired
-                                label="Name"
-                                placeholder="Enter your name"
-                                type="password"
-                              />
-                              <Input
-                                isRequired
-                                label="Email"
-                                placeholder="Enter your email"
-                                type="email"
-                              />
-                              <Input
-                                isRequired
-                                label="Password"
-                                placeholder="Enter your password"
-                                type="password"
-                              />
-
-                              <div className="flex gap-2 justify-end">
-                                <Button fullWidth color="primary">
-                                  Sign up
-                                </Button>
-                              </div>
-                            </div>
-                          </Tab>
-                          <Tab key="ban-user" title="Ban user">
-                            <div className="flex flex-col gap-4 h-[300px]">
-                              <Input
-                                isRequired
-                                label="Name"
-                                placeholder="Enter your name"
-                                type="password"
-                              />
-                              <Input
-                                isRequired
-                                label="Email"
-                                placeholder="Enter your email"
-                                type="email"
-                              />
-                              <Input
-                                isRequired
-                                label="Password"
-                                placeholder="Enter your password"
-                                type="password"
-                              />
-
-                              <div className="flex gap-2 justify-end">
-                                <Button fullWidth color="primary">
-                                  Sign up
-                                </Button>
-                              </div>
-                            </div>
-                          </Tab>
-                          <Tab key="delete-user" title="Delete user">
+                          <Tab key="edit-user" title="Удаление">
                             <div className="flex flex-col gap-4 h-[300px]">
                               <Input
                                 isRequired
@@ -2305,24 +2234,25 @@ export default function Page() {
             </CardHeader>
             <Divider className="my-4" />
             <CardBody className="overflow-visible py-2">
+              <p className="text-tiny uppercase font-bold">Возможности</p>
               <Listbox color="primary" variant="flat" aria-label="Actions">
                 <ListboxItem
                   key="new"
                   startContent={<AddIcon className={iconClasses} />}
                 >
-                  New service
+                  Добавление
                 </ListboxItem>
                 <ListboxItem
                   key="copy"
                   startContent={<ChangeCircleIcon className={iconClasses} />}
                 >
-                  Change service status
+                  Изменение статуса
                 </ListboxItem>
                 <ListboxItem
                   key="edit"
                   startContent={<EditIcon className={iconClasses} />}
                 >
-                  Edit service
+                  Изменение данных
                 </ListboxItem>
                 <ListboxItem
                   key="delete"
@@ -2330,7 +2260,7 @@ export default function Page() {
                   color="danger"
                   startContent={<RemoveIcon className={iconClasses} />}
                 >
-                  Delete service
+                  Удаление
                 </ListboxItem>
               </Listbox>
             </CardBody>
@@ -2357,7 +2287,7 @@ export default function Page() {
                   {(onClose) => (
                     <>
                       <ModalHeader className="flex flex-col gap-1">
-                        Service
+                        Сервисы
                       </ModalHeader>
                       <ModalBody>
                         <Tabs
@@ -2367,7 +2297,7 @@ export default function Page() {
                           selectedKey={selected}
                           onSelectionChange={setSelected}
                         >
-                          <Tab key="new-user" title="User register">
+                          <Tab key="new-service" title="Добавление">
                             <div className="flex flex-col gap-4">
                               <Input
                                 isRequired
@@ -2389,7 +2319,10 @@ export default function Page() {
                               </div>
                             </div>
                           </Tab>
-                          <Tab key="state-change" title="State change">
+                          <Tab
+                            key="service-state-change"
+                            title="Изменение статуса"
+                          >
                             <div className="flex flex-col gap-4 h-[300px]">
                               <Input
                                 isRequired
@@ -2417,63 +2350,7 @@ export default function Page() {
                               </div>
                             </div>
                           </Tab>
-                          <Tab key="edit-user" title="Edit user">
-                            <div className="flex flex-col gap-4 h-[300px]">
-                              <Input
-                                isRequired
-                                label="Name"
-                                placeholder="Enter your name"
-                                type="password"
-                              />
-                              <Input
-                                isRequired
-                                label="Email"
-                                placeholder="Enter your email"
-                                type="email"
-                              />
-                              <Input
-                                isRequired
-                                label="Password"
-                                placeholder="Enter your password"
-                                type="password"
-                              />
-
-                              <div className="flex gap-2 justify-end">
-                                <Button fullWidth color="primary">
-                                  Sign up
-                                </Button>
-                              </div>
-                            </div>
-                          </Tab>
-                          <Tab key="ban-user" title="Ban user">
-                            <div className="flex flex-col gap-4 h-[300px]">
-                              <Input
-                                isRequired
-                                label="Name"
-                                placeholder="Enter your name"
-                                type="password"
-                              />
-                              <Input
-                                isRequired
-                                label="Email"
-                                placeholder="Enter your email"
-                                type="email"
-                              />
-                              <Input
-                                isRequired
-                                label="Password"
-                                placeholder="Enter your password"
-                                type="password"
-                              />
-
-                              <div className="flex gap-2 justify-end">
-                                <Button fullWidth color="primary">
-                                  Sign up
-                                </Button>
-                              </div>
-                            </div>
-                          </Tab>
-                          <Tab key="delete-user" title="Delete user">
+                          <Tab key="delete-service" title="Удаление">
                             <div className="flex flex-col gap-4 h-[300px]">
                               <Input
                                 isRequired
