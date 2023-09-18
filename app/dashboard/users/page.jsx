@@ -36,7 +36,7 @@ import {
 
 import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
 import EditIcon from "@mui/icons-material/Edit";
-import InfoIcon from '@mui/icons-material/Info';
+import InfoIcon from "@mui/icons-material/Info";
 
 import {
   Modal,
@@ -151,7 +151,7 @@ export default function App() {
       case "first_name":
       case "last_name":
       case "middle_name":
-        return cellValue
+        return cellValue;
       case "sex":
         return cellValue === "M" ? "Мужской" : "Женский";
       case "email":
@@ -181,7 +181,7 @@ export default function App() {
       case "card_id":
         return user.card_id;
       case "snils":
-        return cellValue
+        return cellValue;
       case "actions":
         return (
           <div className="relative flex items-center gap-2">
@@ -197,19 +197,37 @@ export default function App() {
                 </div>
               }
             >
-              <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
-                <InfoIcon />
-              </span>
+              <Button
+                size="sm"
+                isIconOnly
+                variant="faded"
+                aria-label="edit"
+                onPress={() => console.log("info'ed")}
+              >
+                <InfoIcon className="active:opacity-50" />
+              </Button>
             </Tooltip>
             <Tooltip content="Изменить">
-              <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
+              <Button
+                size="sm"
+                isIconOnly
+                color="primary"
+                aria-label="edit"
+                onPress={() => console.log("edited")}
+              >
                 <EditIcon />
-              </span>
+              </Button>
             </Tooltip>
             <Tooltip color="danger" content="Удалить">
-              <span className="text-lg text-danger cursor-pointer active:opacity-50">
+              <Button
+                size="sm"
+                isIconOnly
+                color="danger"
+                aria-label="block"
+                onPress={() => console.log("deleted")}
+              >
                 <RemoveCircleOutlineIcon />
-              </span>
+              </Button>
             </Tooltip>
           </div>
         );

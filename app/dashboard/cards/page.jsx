@@ -1,6 +1,12 @@
 "use client";
 import React from "react";
-import { SearchIcon, ChevronDownIcon, PlusIcon, EyeIcon, DeleteIcon } from "../../components/icons";
+import {
+  SearchIcon,
+  ChevronDownIcon,
+  PlusIcon,
+  EyeIcon,
+  DeleteIcon,
+} from "../../components/icons";
 import BlockIcon from "@mui/icons-material/Block";
 import { columns, statusOptions } from "../../utils/cardsData";
 import { capitalize } from "../../utils/utils";
@@ -100,9 +106,8 @@ export default function App() {
     let filteredTransactions = [...transactions];
 
     if (hasSearchFilter) {
-      filteredTransactions = filteredTransactions.filter(
-        (transaction) =>
-          transaction.card_number.includes(filterValue.toLowerCase())
+      filteredTransactions = filteredTransactions.filter((transaction) =>
+        transaction.card_number.includes(filterValue.toLowerCase())
       );
     }
     if (
@@ -165,9 +170,14 @@ export default function App() {
         return (
           <User
             description={cellValue.id}
-            name={cellValue.first_name + " " + cellValue.middle_name + " " + cellValue.last_name}
-          >
-          </User>
+            name={
+              cellValue.first_name +
+              " " +
+              cellValue.middle_name +
+              " " +
+              cellValue.last_name
+            }
+          ></User>
         );
       case "uID":
         return cellValue;
@@ -188,14 +198,26 @@ export default function App() {
         return (
           <div className="relative flex items-center gap-2">
             <Tooltip content="Изменить статус">
-              <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
+              <Button
+                size="sm"
+                isIconOnly
+                color="primary"
+                aria-label="edit"
+                onPress={() => console.log("edited")}
+              >
                 <EditIcon />
-              </span>
+              </Button>
             </Tooltip>
             <Tooltip color="danger" content="Заблокировать">
-              <span className="text-lg text-danger cursor-pointer active:opacity-50">
+              <Button
+                size="sm"
+                isIconOnly
+                color="danger"
+                aria-label="block"
+                onPress={() => console.log("blocked")}
+              >
                 <BlockIcon />
-              </span>
+              </Button>
             </Tooltip>
           </div>
         );
@@ -310,7 +332,7 @@ export default function App() {
             Всего {transactions.length} карт
           </span>
           <label className="flex items-center text-default-400 text-small">
-            Количество строк: 
+            Количество строк:
             <select
               className="bg-transparent outline-none text-default-400 text-small"
               onChange={onRowsPerPageChange}

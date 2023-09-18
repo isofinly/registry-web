@@ -14,7 +14,7 @@
         "active_until": "2022-03-15"
       },
       "state": "active",
-      "name": "John Doe",
+      "name": "Льгота для престарелых",
       "info": "Customer since 2021"
     },
     {
@@ -30,7 +30,7 @@
         "active_until": "2022-06-20"
       },
       "state": "active",
-      "name": "Jane Smith",
+      "name": "Школьная льгота",
       "info": "Customer since 2020"
     },
     {
@@ -42,7 +42,7 @@
         "active_until": "2022-04-10"
       },
       "state": "inactive",
-      "name": "Alice Johnson",
+      "name": "Скидка для молодых отцов",
       "info": "Customer since 2019"
     }
   ]

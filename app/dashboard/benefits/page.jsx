@@ -198,19 +198,37 @@ export default function App() {
                 </div>
               }
             >
-              <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
+              <Button
+                size="sm"
+                isIconOnly
+                variant="faded"
+                aria-label="edit"
+                onPress={() => console.log("info'ed")}
+              >
                 <InfoIcon />
-              </span>
+              </Button>
             </Tooltip>
             <Tooltip content="Изменить">
-              <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
+              <Button
+                size="sm"
+                isIconOnly
+                color="primary"
+                aria-label="edit"
+                onPress={() => console.log("edited")}
+              >
                 <EditIcon />
-              </span>
+              </Button>
             </Tooltip>
             <Tooltip color="danger" content="Удалить">
-              <span className="text-lg text-danger cursor-pointer active:opacity-50">
+              <Button
+                size="sm"
+                isIconOnly
+                color="danger"
+                aria-label="block"
+                onPress={() => console.log("deleted")}
+              >
                 <RemoveCircleOutlineIcon />
-              </span>
+              </Button>
             </Tooltip>
           </div>
         );

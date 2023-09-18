@@ -1,6 +1,12 @@
 "use client";
 import React from "react";
-import { SearchIcon, ChevronDownIcon, PlusIcon, EyeIcon, DeleteIcon } from "../../components/icons";
+import {
+  SearchIcon,
+  ChevronDownIcon,
+  PlusIcon,
+  EyeIcon,
+  DeleteIcon,
+} from "../../components/icons";
 import BlockIcon from "@mui/icons-material/Block";
 import { columns, statusOptions } from "../../utils/transactionData";
 import { capitalize } from "../../utils/utils";
@@ -99,9 +105,8 @@ export default function App() {
     let filteredTransactions = [...transactions];
 
     if (hasSearchFilter) {
-      filteredTransactions = filteredTransactions.filter(
-        (transaction) =>
-          transaction.card_id.includes(filterValue.toLowerCase())
+      filteredTransactions = filteredTransactions.filter((transaction) =>
+        transaction.card_id.includes(filterValue.toLowerCase())
       );
     }
     if (
@@ -164,10 +169,15 @@ export default function App() {
       case "conductor":
         return (
           <User
-            description={"Смена "+cellValue.shift}
-            name={cellValue.first_name + " " + cellValue.middle_name + " " + cellValue.last_name}
-          >
-          </User>
+            description={"Смена " + cellValue.shift}
+            name={
+              cellValue.first_name +
+              " " +
+              cellValue.middle_name +
+              " " +
+              cellValue.last_name
+            }
+          ></User>
         );
       case "city":
         return cellValue.charAt(0).toUpperCase() + cellValue.slice(1);
@@ -188,14 +198,26 @@ export default function App() {
         return (
           <div className="relative flex items-center gap-2">
             <Tooltip content="Изменить статус">
-              <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
+              <Button
+              size="sm"
+                isIconOnly
+                color="primary"
+                aria-label="edit"
+                onPress={() => console.log("edited")}
+              >
                 <EditIcon />
-              </span>
+              </Button>
             </Tooltip>
             <Tooltip color="danger" content="Заблокировать">
-              <span className="text-lg text-danger cursor-pointer active:opacity-50">
+              <Button
+              size="sm"
+                isIconOnly
+                color="danger"
+                aria-label="block"
+                onPress={() => console.log("blocked")}
+              >
                 <BlockIcon />
-              </span>
+              </Button>
             </Tooltip>
           </div>
         );
