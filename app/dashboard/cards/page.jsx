@@ -1,12 +1,13 @@
 "use client";
 import React from "react";
-import { SearchIcon, ChevronDownIcon, PlusIcon, EyeIcon, DeleteIcon } from "../../components/icons";
-import BlockIcon from "@mui/icons-material/Block";
-import { columns, statusOptions } from "../../utils/cardsData";
+
+import { DeleteIcon } from "../../components/icons";
+import { EyeIcon } from "../../components/icons";
+import { PlusIcon } from "../../components/icons";
+import { ChevronDownIcon } from "../../components/icons";
+import { SearchIcon } from "../../components/icons";
+import { columns, statusOptions } from "../../utils/discountForCardsData";
 import { capitalize } from "../../utils/utils";
-import EditIcon from "@mui/icons-material/Edit";
-import PublishIcon from "@mui/icons-material/Publish";
-import GetAppIcon from "@mui/icons-material/GetApp";
 
 import useSWR from "swr";
 
@@ -24,14 +25,20 @@ import {
   DropdownMenu,
   DropdownItem,
   Chip,
-  User,
+  benefit,
   Pagination,
   Selection,
   ChipProps,
   Tooltip,
   SortDescriptor,
   Spinner,
+  getKeyValue,
+  ButtonGroup,
 } from "@nextui-org/react";
+
+import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
+import EditIcon from "@mui/icons-material/Edit";
+import InfoIcon from "@mui/icons-material/Info";
 
 import {
   Modal,
@@ -44,14 +51,16 @@ import {
 
 const statusColorMap = {
   active: "success",
-  blocked: "danger",
-  suspended: "warning",
+  delete: "danger",
+  pause: "warning",
 };
 
 const INITIAL_VISIBLE_COLUMNS = [
-  "card_number",
-  "user",
+  "name",
+  "value",
   "status",
+  "card_data",
+  "actions",
 ];
 
 const fetcher = (...args) => fetch(...args).then((res) => res.json());
@@ -69,15 +78,16 @@ export default function App() {
     direction: "ascending",
   });
   const [page, setPage] = React.useState(1);
+  const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
-  const { data, isLoading } = useSWR(`/cards.json`, fetcher, {
+  const { data, isLoading } = useSWR(`/discount.json`, fetcher, {
     keepPreviousData: true,
   });
 
   const loadingState =
     isLoading || data?.results.length === 0 ? "Загрузка" : "Неактивен";
 
-  const transactions = React.useMemo(() => data?.results || [], [data]);
+  const benefits = React.useMemo(() => data?.results || [], [data]);
 
   const hasSearchFilter = Boolean(filterValue);
 
@@ -90,25 +100,29 @@ export default function App() {
   }, [visibleColumns]);
 
   const filteredItems = React.useMemo(() => {
-    let filteredTransactions = [...transactions];
+    let filteredbenefits = [...benefits];
 
     if (hasSearchFilter) {
-      filteredTransactions = filteredTransactions.filter(
-        (transaction) =>
-          transaction.card_number.includes(filterValue.toLowerCase())
+      filteredbenefits = filteredbenefits.filter(
+        (benefit) =>
+          benefit.first_name
+            .toLowerCase()
+            .includes(filterValue.toLowerCase()) ||
+          benefit.last_name.toLowerCase().includes(filterValue.toLowerCase()) ||
+          benefit.middle_name.toLowerCase().includes(filterValue.toLowerCase())
       );
     }
     if (
       statusFilter !== "all" &&
       Array.from(statusFilter).length !== statusOptions.length
     ) {
-      filteredTransactions = filteredTransactions.filter((transaction) =>
-        Array.from(statusFilter).includes(transaction.status)
+      filteredbenefits = filteredbenefits.filter((benefit) =>
+        Array.from(statusFilter).includes(benefit.state)
       );
     }
 
-    return filteredTransactions;
-  }, [transactions, hasSearchFilter, statusFilter, filterValue]);
+    return filteredbenefits;
+  }, [benefits, hasSearchFilter, statusFilter, filterValue]);
 
   const pages = Math.ceil(filteredItems.length / rowsPerPage);
 
@@ -129,32 +143,109 @@ export default function App() {
     });
   }, [sortDescriptor, items]);
 
-  const renderCell = React.useCallback((user, columnKey) => {
-    const cellValue = user[columnKey];
+  const [cardsList, setCardsList] = React.useState(new Set([]));
+
+  const renderCell = React.useCallback((benefit, columnKey) => {
+    const cellValue = benefit[columnKey];
 
     switch (columnKey) {
       case "id":
         return cellValue;
-      case "card_number":
+      case "name":
         return cellValue;
-      case "user":
+      case "value":
+        return cellValue + "%";
+      case "sex":
+        return cellValue === "M" ? "Мужской" : "Женский";
+      case "age":
+        return cellValue;
+      case "time_active":
         return (
-          <User
-            description={cellValue.id}
-            name={cellValue.first_name + " " + cellValue.middle_name + " " + cellValue.last_name}
-          >
-          </User>
+            <div className="px-1 py-2">
+              <div className="text-small font-bold">
+                Активна до: {cellValue.end}
+              </div>
+              <div className="text-tiny">Активирована: {cellValue.start}</div>
+            </div>
         );
       case "status":
         return (
-          <Chip
-            className="capitalize"
-            color={statusColorMap[cellValue]}
-            size="sm"
+            <Chip
+                className="capitalize"
+                color={statusColorMap[benefit.status]}
+                size="sm"
+                variant="flat"
+            >
+              {cellValue}
+            </Chip>
+        );
+      case "izk":
+        return cellValue === true ? <Chip
+            color={"success"}
             variant="flat"
-          >
-            {cellValue}
-          </Chip>
+        >
+          {"Обязательна"}
+        </Chip>:<Chip
+            color={"warning"}
+            variant="flat"
+        >
+          {"Не требуется"}
+        </Chip>;
+      case "card_data":
+        return (
+          <>
+            <Button color="primary" onPress={() => setCardsList(cellValue)}>
+              Список карт
+            </Button>
+          </>
+        );
+
+      case "actions":
+        return (
+          <div className="relative flex items-center gap-2">
+            <Tooltip
+              content={
+                <div className="px-1 py-2">
+                  <div className="text-small font-bold">
+                    Дополнительная информация:
+                  </div>
+                  <div className="text-tiny">{benefit.info}</div>
+                </div>
+              }
+            >
+              <Button
+                size="sm"
+                isIconOnly
+                variant="faded"
+                aria-label="edit"
+                onPress={() => console.log("info'ed")}
+              >
+                <InfoIcon />
+              </Button>
+            </Tooltip>
+            <Tooltip content="Изменить">
+              <Button
+                size="sm"
+                isIconOnly
+                color="primary"
+                aria-label="edit"
+                onPress={() => console.log("edited")}
+              >
+                <EditIcon />
+              </Button>
+            </Tooltip>
+            <Tooltip color="danger" content="Удалить">
+              <Button
+                size="sm"
+                isIconOnly
+                color="danger"
+                aria-label="block"
+                onPress={() => console.log("deleted")}
+              >
+                <RemoveCircleOutlineIcon />
+              </Button>
+            </Tooltip>
+          </div>
         );
       default:
         return cellValue;
@@ -198,8 +289,8 @@ export default function App() {
         <div className="flex justify-between gap-3 items-end">
           <Input
             isClearable
-            className="w-full sm:max-w-[50%]"
-            placeholder="Поиск по номеру карты..."
+            className="w-full sm:max-w-[44%]"
+            placeholder="Поиск по ФИО..."
             startContent={<SearchIcon />}
             value={filterValue}
             onClear={() => onClear()}
@@ -209,24 +300,24 @@ export default function App() {
             <Dropdown>
               <DropdownTrigger className="hidden sm:flex">
                 <Button
-                    endContent={<ChevronDownIcon className="text-small" />}
-                    variant="flat"
+                  endContent={<ChevronDownIcon className="text-small" />}
+                  variant="flat"
                 >
                   Статус
                 </Button>
               </DropdownTrigger>
               <DropdownMenu
-                  disallowEmptySelection
-                  aria-label="Table Columns"
-                  closeOnSelect={false}
-                  selectedKeys={statusFilter}
-                  selectionMode="multiple"
-                  onSelectionChange={setStatusFilter}
+                disallowEmptySelection
+                aria-label="Table Columns"
+                closeOnSelect={false}
+                selectedKeys={statusFilter}
+                selectionMode="multiple"
+                onSelectionChange={setStatusFilter}
               >
                 {statusOptions.map((status) => (
-                    <DropdownItem key={status.uid} className="capitalize">
-                      {capitalize(status.name)}
-                    </DropdownItem>
+                  <DropdownItem key={status.uid} className="capitalize">
+                    {capitalize(status.name)}
+                  </DropdownItem>
                 ))}
               </DropdownMenu>
             </Dropdown>
@@ -254,14 +345,17 @@ export default function App() {
                 ))}
               </DropdownMenu>
             </Dropdown>
+            <Button color="primary" endContent={<PlusIcon />}>
+              Добавить
+            </Button>
           </div>
         </div>
         <div className="flex justify-between items-center">
           <span className="text-default-400 text-small">
-            Всего {transactions.length} карт
+            Всего {benefits.length}
           </span>
           <label className="flex items-center text-default-400 text-small">
-            Количество строк: 
+            Количество строк:
             <select
               className="bg-transparent outline-none text-default-400 text-small"
               onChange={onRowsPerPageChange}
@@ -279,7 +373,7 @@ export default function App() {
     onSearchChange,
     statusFilter,
     visibleColumns,
-    transactions.length,
+    benefits.length,
     onRowsPerPageChange,
     onClear,
   ]);
@@ -296,22 +390,24 @@ export default function App() {
           onChange={setPage}
         />
         <div className="hidden sm:flex w-[30%] justify-end gap-2">
-          <Button
-            isDisabled={pages === 1}
-            size="sm"
-            variant="flat"
-            onPress={onPreviousPage}
-          >
-            Назад
-          </Button>
-          <Button
-            isDisabled={pages === 1}
-            size="sm"
-            variant="flat"
-            onPress={onNextPage}
-          >
-            Вперед
-          </Button>
+          <ButtonGroup>
+            <Button
+              isDisabled={pages === 1}
+              size="sm"
+              variant="flat"
+              onPress={onPreviousPage}
+            >
+              Назад
+            </Button>
+            <Button
+              isDisabled={pages === 1}
+              size="sm"
+              variant="flat"
+              onPress={onNextPage}
+            >
+              Вперед
+            </Button>
+          </ButtonGroup>
         </div>
       </div>
     );
@@ -324,9 +420,35 @@ export default function App() {
     onNextPage,
   ]);
 
+  let globalVariable;
+
+  const [cardPage, setCardPage] = React.useState(1);
+  const rowsPerCardPage = 20;
+
+  const cards = React.useMemo(() => {
+    let cardPages = cardsList
+      ? Math.ceil(cardsList.length / rowsPerCardPage)
+      : 1;
+    const start = (cardPage - 1) * rowsPerCardPage;
+    const end = start + rowsPerCardPage;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    globalVariable = cardPages;
+    if (cardsList && cardsList.length > 0) {
+      return cardsList.slice(start, end);
+    } else {
+      return []; // Return an empty array or any other default value
+    }
+  }, [cardsList, cardPage]);
+
+  const renderCardCell = React.useCallback((benefit, columnKey) => {
+    return benefit[columnKey];
+  }, []);
+
   return (
-    <div className="">
+    // <div className="flex justify-items-center justify-center">
+    <div className="flex justify-center grid-flow-row-dense grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-2 ">
       <Table
+        className="col-span-1"
         aria-label="Example table with custom cells, pagination and sorting"
         isHeaderSticky
         bottomContent={bottomContent}
@@ -354,7 +476,7 @@ export default function App() {
           )}
         </TableHeader>
         <TableBody
-          emptyContent={"No transactions found"}
+          emptyContent={"No benefits found"}
           items={sortedItems}
           loadingContent={<Spinner />}
           loadingState={loadingState}
@@ -368,6 +490,41 @@ export default function App() {
           )}
         </TableBody>
       </Table>
+
+      <Table
+        className="col-span-1"
+        aria-label="cards data table"
+        bottomContent={
+          <div className="flex w-full justify-center">
+            <Pagination
+              isCompact
+              showShadow
+              color="primary"
+              page={cardPage}
+              total={globalVariable}
+              onChange={(page) => setCardPage(page)}
+            />
+          </div>
+        }
+        classNames={{
+          wrapper: "min-h-[222px]",
+        }}
+      >
+        <TableHeader>
+          <TableColumn key="card_number">Номер</TableColumn>
+          <TableColumn key="card_id">ID</TableColumn>
+        </TableHeader>
+        <TableBody items={cards}>
+          {(item) => (
+            <TableRow key={item.card_id}>
+              {(columnKey) => (
+                <TableCell>{renderCardCell(item, columnKey)}</TableCell>
+              )}
+            </TableRow>
+          )}
+        </TableBody>
+      </Table>
     </div>
+    // </div>
   );
 }

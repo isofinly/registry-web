@@ -7,6 +7,7 @@ const columns = [
     { name: "Срок годности", uid: "time_active"},
     { name: "Статус", uid: "status", sortable: true  },
     { name: "ЕКЖ", uid: "izk", sortable: true  },
+    { name: "Номер карты", uid: "card_data"  },
     { name: "Действия", uid: "actions" },
 ];
 

@@ -1,11 +1,8 @@
 "use client";
 import React from "react";
-import { EditIcon } from "../../components/icons";
-import { DeleteIcon } from "../../components/icons";
-import { PlusIcon } from "../../components/icons";
-import { ChevronDownIcon } from "../../components/icons";
-import { SearchIcon } from "../../components/icons";
-import { columns, statusOptions } from "../../utils/discountData";
+import { SearchIcon, ChevronDownIcon, PlusIcon, EyeIcon, DeleteIcon } from "../../components/icons";
+import BlockIcon from "@mui/icons-material/Block";
+import { columns, statusOptions } from "../../utils/cardsData";
 import { capitalize } from "../../utils/utils";
 
 import useSWR from "swr";
@@ -24,22 +21,34 @@ import {
   DropdownMenu,
   DropdownItem,
   Chip,
+  User,
   Pagination,
+  Selection,
+  ChipProps,
   Tooltip,
+  SortDescriptor,
   Spinner,
+} from "@nextui-org/react";
+
+import {
+  Modal,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  useDisclosure,
 } from "@nextui-org/react";
 
 const statusColorMap = {
   active: "success",
-  delete: "danger",
-  pause: "warning",
+  blocked: "danger",
+  suspended: "warning",
 };
 
 const INITIAL_VISIBLE_COLUMNS = [
-  "name",
-  "value",
+  "card_number",
+  "user",
   "status",
-  "actions",
 ];
 
 const fetcher = (...args) => fetch(...args).then((res) => res.json());
@@ -58,14 +67,14 @@ export default function App() {
   });
   const [page, setPage] = React.useState(1);
 
-  const { data, isLoading } = useSWR(`/discount.json`, fetcher, {
+  const { data, isLoading } = useSWR(`/cards.json`, fetcher, {
     keepPreviousData: true,
   });
 
   const loadingState =
     isLoading || data?.results.length === 0 ? "Загрузка" : "Неактивен";
 
-  const users = React.useMemo(() => data?.results || [], [data]);
+  const transactions = React.useMemo(() => data?.results || [], [data]);
 
   const hasSearchFilter = Boolean(filterValue);
 
@@ -78,41 +87,27 @@ export default function App() {
   }, [visibleColumns]);
 
   const filteredItems = React.useMemo(() => {
-    let filteredUsers = [...users];
+    let filteredTransactions = [...transactions];
 
     if (hasSearchFilter) {
-      filteredUsers = filteredUsers.filter(
-          (user) =>
-              user.name.toLowerCase().includes(filterValue.toLowerCase())
+      filteredTransactions = filteredTransactions.filter(
+        (transaction) =>
+          transaction.card_number.includes(filterValue.toLowerCase())
       );
     }
     if (
-        statusFilter !== "all" &&
-        Array.from(statusFilter).length !== statusOptions.length
+      statusFilter !== "all" &&
+      Array.from(statusFilter).length !== statusOptions.length
     ) {
-      filteredUsers = filteredUsers.filter((user) =>
-          Array.from(statusFilter).includes(user.status)
+      filteredTransactions = filteredTransactions.filter((transaction) =>
+        Array.from(statusFilter).includes(transaction.status)
       );
     }
 
-    // Добавляем сортировку для столбца "value" в порядке, указанном в sortDescriptor
-    filteredUsers.sort((a, b) => {
-      if (sortDescriptor.column === "value") {
-        const first = parseFloat(a["value"]);
-        const second = parseFloat(b["value"]);
-        const cmp = first < second ? -1 : first > second ? 1 : 0;
-        return sortDescriptor.direction === "descending" ? -cmp : cmp;
-      }
-      // Другие столбцы могут быть отсортированы по-разному, добавьте их обработку, если необходимо
-      return 0;
-    });
-
-    return filteredUsers;
-  }, [users, hasSearchFilter, statusFilter, filterValue, sortDescriptor]);
-
+    return filteredTransactions;
+  }, [transactions, hasSearchFilter, statusFilter, filterValue]);
 
   const pages = Math.ceil(filteredItems.length / rowsPerPage);
-
 
   const items = React.useMemo(() => {
     const start = (page - 1) * rowsPerPage;
@@ -131,68 +126,32 @@ export default function App() {
     });
   }, [sortDescriptor, items]);
 
-
-
   const renderCell = React.useCallback((user, columnKey) => {
     const cellValue = user[columnKey];
 
     switch (columnKey) {
       case "id":
         return cellValue;
-      case "name":
+      case "card_number":
         return cellValue;
-      case "value":
-        return cellValue + "%";
-      case "sex":
-        return cellValue === "M" ? "Мужской" : "Женский";
-      case "age":
-        return cellValue;
-      case "time_active":
+      case "user":
         return (
-            <div className="px-1 py-2">
-              <div className="text-small font-bold">
-                Активна до: {cellValue.end}
-              </div>
-              <div className="text-tiny">Активирована: {cellValue.start}</div>
-            </div>
+          <User
+            description={cellValue.id}
+            name={cellValue.first_name + " " + cellValue.middle_name + " " + cellValue.last_name}
+          >
+          </User>
         );
       case "status":
         return (
           <Chip
             className="capitalize"
-            color={statusColorMap[user.status]}
+            color={statusColorMap[cellValue]}
             size="sm"
             variant="flat"
           >
             {cellValue}
           </Chip>
-        );
-      case "izk":
-        return cellValue === true ? <Chip
-            color={"success"}
-            variant="flat"
-        >
-          {"Обязательна"}
-        </Chip>:<Chip
-          color={"warning"}
-          variant="flat"
-      >
-        {"Не требуется"}
-      </Chip>;
-      case "actions":
-        return (
-          <div className="relative flex items-center gap-2">
-            <Tooltip content="Изменить">
-              <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
-                <EditIcon />
-              </span>
-            </Tooltip>
-            <Tooltip color="danger" content="Удалить">
-              <span className="text-lg text-danger cursor-pointer active:opacity-50">
-                <DeleteIcon />
-              </span>
-            </Tooltip>
-          </div>
         );
       default:
         return cellValue;
@@ -236,8 +195,8 @@ export default function App() {
         <div className="flex justify-between gap-3 items-end">
           <Input
             isClearable
-            className="w-full sm:max-w-[44%]"
-            placeholder="Поиск по названию"
+            className="w-full sm:max-w-[50%]"
+            placeholder="Поиск по номеру карты..."
             startContent={<SearchIcon />}
             value={filterValue}
             onClear={() => onClear()}
@@ -247,24 +206,24 @@ export default function App() {
             <Dropdown>
               <DropdownTrigger className="hidden sm:flex">
                 <Button
-                  endContent={<ChevronDownIcon className="text-small" />}
-                  variant="flat"
+                    endContent={<ChevronDownIcon className="text-small" />}
+                    variant="flat"
                 >
                   Статус
                 </Button>
               </DropdownTrigger>
               <DropdownMenu
-                disallowEmptySelection
-                aria-label="Table Columns"
-                closeOnSelect={false}
-                selectedKeys={statusFilter}
-                selectionMode="multiple"
-                onSelectionChange={setStatusFilter}
+                  disallowEmptySelection
+                  aria-label="Table Columns"
+                  closeOnSelect={false}
+                  selectedKeys={statusFilter}
+                  selectionMode="multiple"
+                  onSelectionChange={setStatusFilter}
               >
                 {statusOptions.map((status) => (
-                  <DropdownItem key={status.uid} className="capitalize">
-                    {capitalize(status.name)}
-                  </DropdownItem>
+                    <DropdownItem key={status.uid} className="capitalize">
+                      {capitalize(status.name)}
+                    </DropdownItem>
                 ))}
               </DropdownMenu>
             </Dropdown>
@@ -292,17 +251,14 @@ export default function App() {
                 ))}
               </DropdownMenu>
             </Dropdown>
-            <Button color="primary" endContent={<PlusIcon />}>
-              Добавить
-            </Button>
           </div>
         </div>
         <div className="flex justify-between items-center">
           <span className="text-default-400 text-small">
-            Всего скидок: {users.length}
+            Всего {transactions.length} карт
           </span>
           <label className="flex items-center text-default-400 text-small">
-            Количество строк:
+            Количество строк: 
             <select
               className="bg-transparent outline-none text-default-400 text-small"
               onChange={onRowsPerPageChange}
@@ -320,7 +276,7 @@ export default function App() {
     onSearchChange,
     statusFilter,
     visibleColumns,
-    users.length,
+    transactions.length,
     onRowsPerPageChange,
     onClear,
   ]);
@@ -395,7 +351,7 @@ export default function App() {
           )}
         </TableHeader>
         <TableBody
-          emptyContent={"No discounts found"}
+          emptyContent={"No transactions found"}
           items={sortedItems}
           loadingContent={<Spinner />}
           loadingState={loadingState}
