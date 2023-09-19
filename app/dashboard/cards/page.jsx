@@ -1,15 +1,19 @@
 "use client";
 import React from "react";
-import { SearchIcon, ChevronDownIcon, PlusIcon, EyeIcon, DeleteIcon } from "../../components/icons";
+import useSWR from "swr";
+// icons
+import {
+  SearchIcon,
+  ChevronDownIcon,
+} from "@components/icons";
 import BlockIcon from "@mui/icons-material/Block";
-import { columns, statusOptions } from "../../utils/cardsData";
-import { capitalize } from "../../utils/utils";
 import EditIcon from "@mui/icons-material/Edit";
 import PublishIcon from "@mui/icons-material/Publish";
 import GetAppIcon from "@mui/icons-material/GetApp";
-
-import useSWR from "swr";
-
+// misc
+import { columns, statusOptions } from "@utils/cardsData";
+import { capitalize } from "@utils/utils";
+// ui
 import {
   Table,
   TableHeader,
@@ -30,10 +34,7 @@ import {
   ChipProps,
   Tooltip,
   SortDescriptor,
-  Spinner,
-} from "@nextui-org/react";
-
-import {
+  Spinner, 
   Modal,
   ModalContent,
   ModalHeader,
@@ -41,13 +42,12 @@ import {
   ModalFooter,
   useDisclosure,
 } from "@nextui-org/react";
-
+// cfgs
 const statusColorMap = {
   active: "success",
   blocked: "danger",
   suspended: "warning",
 };
-
 const INITIAL_VISIBLE_COLUMNS = [
   "id",
   "card_id",
@@ -100,9 +100,8 @@ export default function App() {
     let filteredTransactions = [...transactions];
 
     if (hasSearchFilter) {
-      filteredTransactions = filteredTransactions.filter(
-        (transaction) =>
-          transaction.card_number.includes(filterValue.toLowerCase())
+      filteredTransactions = filteredTransactions.filter((transaction) =>
+        transaction.card_number.includes(filterValue.toLowerCase())
       );
     }
     if (
@@ -136,74 +135,6 @@ export default function App() {
     });
   }, [sortDescriptor, items]);
 
-  const renderCell = React.useCallback((user, columnKey) => {
-    const cellValue = user[columnKey];
-
-    switch (columnKey) {
-      case "id":
-        return cellValue;
-      case "card_number":
-        return cellValue;
-      case "amount":
-        return cellValue;
-      case "time_active":
-        return (
-          <div className="px-1 py-2">
-            <div className="text-small font-bold">
-              Активна до: {cellValue.end}
-            </div>
-            <div className="text-tiny">Активирована: {cellValue.start}</div>
-          </div>
-        );
-      case "last_activity":
-        return (
-          <div className="px-1 py-2">
-            <div className="text-small font-bold">{cellValue}</div>
-          </div>
-        );
-      case "user":
-        return (
-          <User
-            description={cellValue.id}
-            name={cellValue.first_name + " " + cellValue.middle_name + " " + cellValue.last_name}
-          >
-          </User>
-        );
-      case "uID":
-        return cellValue;
-      case "status":
-        return (
-          <Chip
-            className="capitalize"
-            color={statusColorMap[cellValue]}
-            size="sm"
-            variant="flat"
-          >
-            {cellValue}
-          </Chip>
-        );
-      case "card_id":
-        return cellValue;
-      case "actions":
-        return (
-          <div className="relative flex items-center gap-2">
-            <Tooltip content="Изменить статус">
-              <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
-                <EditIcon />
-              </span>
-            </Tooltip>
-            <Tooltip color="danger" content="Заблокировать">
-              <span className="text-lg text-danger cursor-pointer active:opacity-50">
-                <BlockIcon />
-              </span>
-            </Tooltip>
-          </div>
-        );
-      default:
-        return cellValue;
-    }
-  }, []);
-
   const onNextPage = React.useCallback(() => {
     if (page < pages) {
       setPage(page + 1);
@@ -233,6 +164,91 @@ export default function App() {
   const onClear = React.useCallback(() => {
     setFilterValue("");
     setPage(1);
+  }, []);
+
+  const renderCell = React.useCallback((user, columnKey) => {
+    const cellValue = user[columnKey];
+
+    switch (columnKey) {
+      case "id":
+        return cellValue;
+      case "card_number":
+        return cellValue;
+      case "amount":
+        return cellValue;
+      case "time_active":
+        return (
+          <div className="px-1 py-2">
+            <div className="text-small font-bold">
+              Активна до: {new Date(cellValue.end).toLocaleDateString() + " " + new Date(cellValue.end).toLocaleTimeString()}
+            </div>
+            <div className="text-tiny">Активирована:{new Date(cellValue.start).toLocaleDateString() + " " + new Date(cellValue.start).toLocaleTimeString()}</div>
+          </div>
+        );
+      case "last_activity":
+        return (
+          <div className="px-1 py-2">
+            <div className="text-small font-bold">{new Date(cellValue).toLocaleDateString() + " " + new Date(cellValue).toLocaleTimeString()}</div>
+          </div>
+        );
+      case "user":
+        return (
+          <User
+            description={cellValue.id}
+            name={
+              cellValue.first_name +
+              " " +
+              cellValue.middle_name +
+              " " +
+              cellValue.last_name
+            }
+          ></User>
+        );
+      case "uID":
+        return cellValue;
+      case "status":
+        return (
+          <Chip
+            className="capitalize"
+            color={statusColorMap[cellValue]}
+            size="sm"
+            variant="flat"
+          >
+            {cellValue}
+          </Chip>
+        );
+      case "card_id":
+        return cellValue;
+      case "actions":
+        return (
+          <div className="relative flex items-center gap-2">
+            <Tooltip content="Изменить статус">
+              <Button
+                size="sm"
+                isIconOnly
+                color="primary"
+                aria-label="edit"
+                onPress={() => console.log("edited")}
+              >
+                <EditIcon />
+              </Button>
+            </Tooltip>
+            <Tooltip color="danger" content="Заблокировать">
+              <Button
+                size="sm"
+                isIconOnly
+                color="danger"
+                aria-label="block"
+                onPress={() => console.log("blocked")}
+              >
+                <BlockIcon />
+              </Button>
+            </Tooltip>
+          </div>
+        );
+      default:
+        return cellValue;
+    }
   }, []);
 
   const topContent = React.useMemo(() => {
@@ -310,7 +326,7 @@ export default function App() {
             Всего {transactions.length} карт
           </span>
           <label className="flex items-center text-default-400 text-small">
-            Количество строк: 
+            Количество строк:
             <select
               className="bg-transparent outline-none text-default-400 text-small"
               onChange={onRowsPerPageChange}

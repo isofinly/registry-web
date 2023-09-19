@@ -6,6 +6,7 @@ const columns = [
   { name: "Пол", uid: "sex",  },
   { name: "Email", uid: "email" },
   { name: "Дата рождения", uid: "born", sortable: true },
+  { name: "СНИЛС", uid: "snils", sortable: true },
   { name: "Город", uid: "city", sortable: true },
   { name: "Статус", uid: "account_states", sortable: true },
   { name: "ID карты", uid: "card_id",  },

@@ -1,16 +1,15 @@
 "use client";
 import React from "react";
-import { EditIcon } from "../../components/icons";
-import { DeleteIcon } from "../../components/icons";
-import { EyeIcon } from "../../components/icons";
-import { PlusIcon } from "../../components/icons";
-import { ChevronDownIcon } from "../../components/icons";
-import { SearchIcon } from "../../components/icons";
-import { columns, statusOptions } from "../../utils/userData";
-import { capitalize } from "../../utils/utils";
-
 import useSWR from "swr";
-
+// misc
+import { capitalize } from "@utils/utils";
+import { columns, statusOptions } from "@utils/userData";
+// icons
+import { PlusIcon, ChevronDownIcon, SearchIcon } from "@components/icons";
+import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
+import EditIcon from "@mui/icons-material/Edit";
+import InfoIcon from "@mui/icons-material/Info";
+// ui 
 import {
   Table,
   TableHeader,
@@ -32,9 +31,6 @@ import {
   Tooltip,
   SortDescriptor,
   Spinner,
-} from "@nextui-org/react";
-
-import {
   Modal,
   ModalContent,
   ModalHeader,
@@ -42,13 +38,12 @@ import {
   ModalFooter,
   useDisclosure,
 } from "@nextui-org/react";
-
+// cfgs
 const statusColorMap = {
   active: "success",
   paused: "danger",
   suspended: "warning",
 };
-
 const INITIAL_VISIBLE_COLUMNS = [
   "first_name",
   "middle_name",
@@ -76,7 +71,7 @@ export default function App() {
   });
   const [page, setPage] = React.useState(1);
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
-
+  // async block start
   const { data, isLoading } = useSWR(`/users.json`, fetcher, {
     keepPreviousData: true,
   });
@@ -85,7 +80,7 @@ export default function App() {
     isLoading || data?.results.length === 0 ? "Загрузка" : "Неактивен";
 
   const users = React.useMemo(() => data?.results || [], [data]);
-
+  // async block end
   const hasSearchFilter = Boolean(filterValue);
 
   const headerColumns = React.useMemo(() => {
@@ -138,80 +133,6 @@ export default function App() {
     });
   }, [sortDescriptor, items]);
 
-  const renderCell = React.useCallback((user, columnKey) => {
-    const cellValue = user[columnKey];
-
-    switch (columnKey) {
-      case "id":
-        return cellValue;
-      case "first_name":
-      case "last_name":
-      case "middle_name":
-        return cellValue.toUpperCase();
-      case "sex":
-        return cellValue === "M" ? "Мужской" : "Женский";
-      case "email":
-        return (
-          <User
-            description={user.email}
-            name={user.first_name + " " + user.last_name}
-          >
-            {user.email}
-          </User>
-        );
-      case "born":
-        return new Date(cellValue).toLocaleDateString();
-      case "city":
-        return cellValue.charAt(0).toUpperCase() + cellValue.slice(1);
-      case "account_states":
-        return (
-          <Chip
-            className="capitalize"
-            color={statusColorMap[user.account_states]}
-            size="sm"
-            variant="flat"
-          >
-            {cellValue}
-          </Chip>
-        );
-      case "card_id":
-        return user.card_id;
-      case "actions":
-        return (
-          <div className="relative flex items-center gap-2">
-            <Tooltip
-              content={
-                <div className="px-1 py-2">
-                  <div className="text-small font-bold">
-                    Последняя активность: {user.last_activity}
-                  </div>
-                  <div className="text-tiny">
-                    ID устройства: {user.deviceId}
-                  </div>
-                </div>
-              }
-            >
-              <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
-                <EyeIcon />
-              </span>
-            </Tooltip>
-            <Tooltip content="Изменить">
-              <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
-                <EditIcon />
-              </span>
-            </Tooltip>
-            <Tooltip color="danger" content="Удалить">
-              <span className="text-lg text-danger cursor-pointer active:opacity-50">
-                <DeleteIcon />
-              </span>
-            </Tooltip>
-          </div>
-        );
-      default:
-        return cellValue;
-    }
-  }, []);
-
   const onNextPage = React.useCallback(() => {
     if (page < pages) {
       setPage(page + 1);
@@ -241,6 +162,100 @@ export default function App() {
   const onClear = React.useCallback(() => {
     setFilterValue("");
     setPage(1);
+  }, []);
+
+  const renderCell = React.useCallback((user, columnKey) => {
+    const cellValue = user[columnKey];
+
+    switch (columnKey) {
+      case "id":
+        return cellValue;
+      case "first_name":
+      case "last_name":
+      case "middle_name":
+        return cellValue;
+      case "sex":
+        return cellValue === "M" ? "Мужской" : "Женский";
+      case "email":
+        return (
+          <User
+            description={user.email}
+            name={user.first_name + " " + user.last_name}
+          >
+            {user.email}
+          </User>
+        );
+      case "born":
+        return new Date(cellValue).toLocaleDateString();
+      case "city":
+        return cellValue.charAt(0).toUpperCase() + cellValue.slice(1);
+      case "account_states":
+        return (
+          <Chip
+            className="capitalize"
+            color={statusColorMap[user.account_states]}
+            size="sm"
+            variant="flat"
+          >
+            {cellValue}
+          </Chip>
+        );
+      case "card_id":
+        return user.card_id;
+      case "snils":
+        return cellValue;
+      case "actions":
+        return (
+          <div className="relative flex items-center gap-2">
+            <Tooltip
+              content={
+                <div className="px-1 py-2">
+                  <div className="text-small font-bold">
+                    Последняя активность: {user.last_activity}
+                  </div>
+                  <div className="text-tiny">
+                    ID устройства: {user.deviceId}
+                  </div>
+                </div>
+              }
+            >
+              <Button
+                size="sm"
+                isIconOnly
+                variant="faded"
+                aria-label="edit"
+                onPress={() => console.log("info'ed")}
+              >
+                <InfoIcon className="active:opacity-50" />
+              </Button>
+            </Tooltip>
+            <Tooltip content="Изменить">
+              <Button
+                size="sm"
+                isIconOnly
+                color="primary"
+                aria-label="edit"
+                onPress={() => console.log("edited")}
+              >
+                <EditIcon />
+              </Button>
+            </Tooltip>
+            <Tooltip color="danger" content="Удалить">
+              <Button
+                size="sm"
+                isIconOnly
+                color="danger"
+                aria-label="block"
+                onPress={() => console.log("deleted")}
+              >
+                <RemoveCircleOutlineIcon />
+              </Button>
+            </Tooltip>
+          </div>
+        );
+      default:
+        return cellValue;
+    }
   }, []);
 
   const topContent = React.useMemo(() => {

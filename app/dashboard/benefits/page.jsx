@@ -1,20 +1,14 @@
 "use client";
 import React from "react";
-import useSWR from "swr";
-// icons
-import {
-  SearchIcon,
-  ChevronDownIcon,
-  PlusIcon,
-  EyeIcon,
-  DeleteIcon,
-} from "@components/icons";
-import EditIcon from "@mui/icons-material/Edit";
-import BlockIcon from "@mui/icons-material/Block";
-// misc
-import { columns, statusOptions } from "@utils/transactionData";
+
+import { PlusIcon } from "@components/icons";
+import { ChevronDownIcon } from "@components/icons";
+import { SearchIcon } from "@components/icons";
+import { columns, statusOptions } from "@utils/benefitData";
 import { capitalize } from "@utils/utils";
-// ui
+
+import useSWR from "swr";
+
 import {
   Table,
   TableHeader,
@@ -29,33 +23,36 @@ import {
   DropdownMenu,
   DropdownItem,
   Chip,
-  User,
+  benefit,
   Pagination,
   Selection,
   ChipProps,
   Tooltip,
   SortDescriptor,
   Spinner,
+  getKeyValue,
+  ButtonGroup,
 } from "@nextui-org/react";
-// cfgs
+
+import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
+import EditIcon from "@mui/icons-material/Edit";
+import InfoIcon from "@mui/icons-material/Info";
+
 const statusColorMap = {
-  completed: "success",
+  active: "success",
   blocked: "danger",
   suspended: "warning",
 };
+
 const INITIAL_VISIBLE_COLUMNS = [
-  "id",
-  "time",
+  "name",
   "amount",
-  "benefit",
-  "coordinates",
-  "card_id",
-  "conductor",
-  "city",
+  "card_data",
+  "time",
   "state",
   "actions",
 ];
-// async fetcher
+
 const fetcher = (...args) => fetch(...args).then((res) => res.json());
 
 export default function App() {
@@ -64,6 +61,7 @@ export default function App() {
   const [visibleColumns, setVisibleColumns] = React.useState(
     new Set(INITIAL_VISIBLE_COLUMNS)
   );
+  const [cardsList, setCardsList] = React.useState(new Set([]));
   const [statusFilter, setStatusFilter] = React.useState("all");
   const [rowsPerPage, setRowsPerPage] = React.useState(15);
   const [sortDescriptor, setSortDescriptor] = React.useState({
@@ -71,16 +69,20 @@ export default function App() {
     direction: "ascending",
   });
   const [page, setPage] = React.useState(1);
-  // async load block
-  const { data, isLoading } = useSWR(`/transactionData.json`, fetcher, {
+  let globalVariable;
+  const [cardPage, setCardPage] = React.useState(1);
+  const rowsPerCardPage = 20;
+
+  // async fetching block start
+  const { data, isLoading } = useSWR(`/benefits.json`, fetcher, {
     keepPreviousData: true,
   });
 
   const loadingState =
     isLoading || data?.results.length === 0 ? "Загрузка" : "Неактивен";
 
-  const transactions = React.useMemo(() => data?.results || [], [data]);
-  // async block end
+  const benefits = React.useMemo(() => data?.results || [], [data]);
+  // async fetching end
 
   const hasSearchFilter = Boolean(filterValue);
 
@@ -93,26 +95,24 @@ export default function App() {
   }, [visibleColumns]);
 
   const filteredItems = React.useMemo(() => {
-    let filteredTransactions = [...transactions];
+    let filteredbenefits = [...benefits];
 
     if (hasSearchFilter) {
-      filteredTransactions = filteredTransactions.filter((transaction) =>
-        transaction.card_id.includes(filterValue.toLowerCase())
+      filteredbenefits = filteredbenefits.filter((benefit) =>
+        benefit.name.toLowerCase().includes(filterValue.toLowerCase())
       );
     }
     if (
       statusFilter !== "all" &&
       Array.from(statusFilter).length !== statusOptions.length
     ) {
-      filteredTransactions = filteredTransactions.filter((transaction) =>
-        Array.from(statusFilter).includes(transaction.state)
+      filteredbenefits = filteredbenefits.filter((benefit) =>
+        Array.from(statusFilter).includes(benefit.state)
       );
     }
 
-    return filteredTransactions;
-  }, [transactions, hasSearchFilter, statusFilter, filterValue]);
-
-  const pages = Math.ceil(filteredItems.length / rowsPerPage);
+    return filteredbenefits;
+  }, [benefits, hasSearchFilter, statusFilter, filterValue]);
 
   const items = React.useMemo(() => {
     const start = (page - 1) * rowsPerPage;
@@ -130,6 +130,28 @@ export default function App() {
       return sortDescriptor.direction === "descending" ? -cmp : cmp;
     });
   }, [sortDescriptor, items]);
+
+  // cards table
+  const pages = Math.ceil(filteredItems.length / rowsPerPage);
+
+  const cards = React.useMemo(() => {
+    let cardPages = cardsList
+      ? Math.ceil(cardsList.length / rowsPerCardPage)
+      : 1;
+    const start = (cardPage - 1) * rowsPerCardPage;
+    const end = start + rowsPerCardPage;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    globalVariable = cardPages;
+    if (cardsList && cardsList.length > 0) {
+      return cardsList.slice(start, end);
+    } else {
+      return [];
+    }
+  }, [cardsList, cardPage]);
+
+  const renderCardCell = React.useCallback((benefit, columnKey) => {
+    return benefit[columnKey];
+  }, []);
 
   const onNextPage = React.useCallback(() => {
     if (page < pages) {
@@ -162,68 +184,69 @@ export default function App() {
     setPage(1);
   }, []);
 
-  const renderCell = React.useCallback((user, columnKey) => {
-    const cellValue = user[columnKey];
+  const renderCell = React.useCallback((benefit, columnKey) => {
+    const cellValue = benefit[columnKey];
 
     switch (columnKey) {
       case "id":
-        return cellValue;
-      case "time":
-        return (
-          new Date(cellValue).toLocaleDateString() +
-          " " +
-          new Date(cellValue).toLocaleTimeString()
-        );
       case "amount":
+      case "name":
         return cellValue;
-      case "benefit":
+      case "card_data":
+        return (
+          <>
+            <Button color="primary" onPress={() => setCardsList(cellValue)}>
+              Список карт
+            </Button>
+          </>
+        );
+      case "time":
         return (
           <div className="px-1 py-2">
             <div className="text-small font-bold">
-              Размер: {cellValue.amount}
+              Активна до:{" "}
+              {new Date(cellValue.active_until).toLocaleDateString()}
             </div>
-            <div className="text-tiny">Тип: {cellValue.type}</div>
+            <div className="text-tiny">
+              Активна с: {new Date(cellValue.active_since).toLocaleDateString()}
+            </div>
           </div>
         );
-      case "coordinates":
-        return (
-          <div className="px-1 py-2">
-            <div className="text-small font-bold">Долгота: {cellValue.lat}</div>
-            <div className="text-tiny">Широта: {cellValue.lon}</div>
-          </div>
-        );
-      case "conductor":
-        return (
-          <User
-            description={"Смена " + cellValue.shift}
-            name={
-              cellValue.first_name +
-              " " +
-              cellValue.middle_name +
-              " " +
-              cellValue.last_name
-            }
-          ></User>
-        );
-      case "city":
-        return cellValue.charAt(0).toUpperCase() + cellValue.slice(1);
       case "state":
         return (
           <Chip
             className="capitalize"
-            color={statusColorMap[cellValue]}
+            color={statusColorMap[benefit.state]}
             size="sm"
             variant="flat"
           >
             {cellValue}
           </Chip>
         );
-      case "card_id":
-        return cellValue;
       case "actions":
         return (
           <div className="relative flex items-center gap-2">
-            <Tooltip content="Изменить статус">
+            <Tooltip
+              content={
+                <div className="px-1 py-2">
+                  <div className="text-small font-bold">
+                    Дополнительная информация:
+                  </div>
+                  <div className="text-tiny">{benefit.info}</div>
+                </div>
+              }
+            >
+              <Button
+                size="sm"
+                isIconOnly
+                variant="faded"
+                aria-label="edit"
+                onPress={() => console.log("info'ed")}
+              >
+                <InfoIcon />
+              </Button>
+            </Tooltip>
+            <Tooltip content="Изменить">
               <Button
                 size="sm"
                 isIconOnly
@@ -234,15 +257,15 @@ export default function App() {
                 <EditIcon />
               </Button>
             </Tooltip>
-            <Tooltip color="danger" content="Заблокировать">
+            <Tooltip color="danger" content="Удалить">
               <Button
                 size="sm"
                 isIconOnly
                 color="danger"
                 aria-label="block"
-                onPress={() => console.log("blocked")}
+                onPress={() => console.log("deleted")}
               >
-                <BlockIcon />
+                <RemoveCircleOutlineIcon />
               </Button>
             </Tooltip>
           </div>
@@ -252,14 +275,14 @@ export default function App() {
     }
   }, []);
 
-  const topContent = React.useMemo(() => {
+const topContent = React.useMemo(() => {
     return (
       <div className="flex flex-col gap-4">
         <div className="flex justify-between gap-3 items-end">
           <Input
             isClearable
             className="w-full sm:max-w-[44%]"
-            placeholder="Поиск по номеру карты..."
+            placeholder="Поиск по названию ..."
             startContent={<SearchIcon />}
             value={filterValue}
             onClear={() => onClear()}
@@ -314,14 +337,17 @@ export default function App() {
                 ))}
               </DropdownMenu>
             </Dropdown>
+            <Button color="primary" endContent={<PlusIcon />}>
+              Добавить
+            </Button>
           </div>
         </div>
         <div className="flex justify-between items-center">
           <span className="text-default-400 text-small">
-            Всего {transactions.length} транзакций
+            Всего {benefits.length} льгот
           </span>
           <label className="flex items-center text-default-400 text-small">
-            Количество строк:
+            Количество строк льгот:
             <select
               className="bg-transparent outline-none text-default-400 text-small"
               onChange={onRowsPerPageChange}
@@ -339,7 +365,7 @@ export default function App() {
     onSearchChange,
     statusFilter,
     visibleColumns,
-    transactions.length,
+    benefits.length,
     onRowsPerPageChange,
     onClear,
   ]);
@@ -356,22 +382,24 @@ export default function App() {
           onChange={setPage}
         />
         <div className="hidden sm:flex w-[30%] justify-end gap-2">
-          <Button
-            isDisabled={pages === 1}
-            size="sm"
-            variant="flat"
-            onPress={onPreviousPage}
-          >
-            Назад
-          </Button>
-          <Button
-            isDisabled={pages === 1}
-            size="sm"
-            variant="flat"
-            onPress={onNextPage}
-          >
-            Вперед
-          </Button>
+          <ButtonGroup>
+            <Button
+              isDisabled={pages === 1}
+              size="sm"
+              variant="flat"
+              onPress={onPreviousPage}
+            >
+              Назад
+            </Button>
+            <Button
+              isDisabled={pages === 1}
+              size="sm"
+              variant="flat"
+              onPress={onNextPage}
+            >
+              Вперед
+            </Button>
+          </ButtonGroup>
         </div>
       </div>
     );
@@ -385,8 +413,11 @@ export default function App() {
   ]);
 
   return (
-    <div className="">
+    <div className="grid gap-2 ">
+      {topContent}
+    <div className="flex justify-center grid-flow-row-dense grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-2 ">
       <Table
+        className="col-span-1"
         aria-label="Example table with custom cells, pagination and sorting"
         isHeaderSticky
         bottomContent={bottomContent}
@@ -394,10 +425,7 @@ export default function App() {
         classNames={{
           wrapper: "max-h-[calc(95vh-200px)]",
         }}
-        // selectedKeys={selectedKeys}
-        // selectionMode="multiple"
         sortDescriptor={sortDescriptor}
-        topContent={topContent}
         topContentPlacement="outside"
         onSelectionChange={setSelectedKeys}
         onSortChange={setSortDescriptor}
@@ -414,7 +442,7 @@ export default function App() {
           )}
         </TableHeader>
         <TableBody
-          emptyContent={"No transactions found"}
+          emptyContent={"No benefits found"}
           items={sortedItems}
           loadingContent={<Spinner />}
           loadingState={loadingState}
@@ -428,6 +456,41 @@ export default function App() {
           )}
         </TableBody>
       </Table>
+
+      <Table
+        className="col-span-1"
+        aria-label="cards data table"
+        bottomContent={
+          <div className="flex w-full justify-center">
+            <Pagination
+              isCompact
+              showShadow
+              color="primary"
+              page={cardPage}
+              total={globalVariable}
+              onChange={(page) => setCardPage(page)}
+            />
+          </div>
+        }
+        classNames={{
+          wrapper: `min-h-[222px]`,
+        }}
+      >
+        <TableHeader>
+          <TableColumn key="card_number">Номер карты</TableColumn>
+          <TableColumn key="card_id">ID карты</TableColumn>
+        </TableHeader>
+        <TableBody items={cards}>
+          {(item) => (
+            <TableRow key={item.card_id}>
+              {(columnKey) => (
+                <TableCell>{renderCardCell(item, columnKey)}</TableCell>
+              )}
+            </TableRow>
+          )}
+        </TableBody>
+      </Table>
+    </div>
     </div>
   );
 }

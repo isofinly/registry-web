@@ -20,9 +20,11 @@
       }
     ],
     "paths": {
-      "@/*": ["./*"]
+      "@/*": ["./*"],
+      "@components/*": ["./app/components/*"],
+      "@utils/*": ["./app/utils/*"],
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "app/card.js", "signin/page.js", "app/api/auth/[...nextauth]/route.js", "app/layout.js", "app/components/navbar.js", "context/Provider.tsx", "app/dashboard/users/page.jsx"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "app/card.js", "signin/page.js", "app/api/auth/[...nextauth]/route.js", "app/layout.js", "app/components/navbar.js", "context/Provider.tsx", "app/dashboard/users/page.jsx", "app/dashboard/management/page.jsx"],
   "exclude": ["node_modules"]
 }

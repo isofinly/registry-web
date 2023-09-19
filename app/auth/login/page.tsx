@@ -78,7 +78,6 @@ const LoginPage = () => {
                   <div className="flex justify-between">
                     <div className="flex flex-col gap-0">
                       <Input
-                        isClearable
                         variant="bordered"
                         placeholder="Введите ваш ID"
                         label="email"

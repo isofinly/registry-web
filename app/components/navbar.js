@@ -18,7 +18,7 @@ import {
 
 import { signOut } from "next-auth/react"
 
-import Logo from "../components/logo.tsx";
+import Logo from "./logo.tsx";
 import {
   ChevronDown,
   Lock,
@@ -58,7 +58,7 @@ export default function NavbarComponent() {
       <Navbar isBordered>
         <NavbarBrand className="h-full" justify="center">
           <Logo className="h-full" />
-          <p className="font-bold text-[#f05c27]">ЕКЖ</p>
+          <p className="font-bold text-orangered">ЕКЖ</p>
         </NavbarBrand>
 
         <Divider orientation="vertical" />
@@ -95,7 +95,7 @@ export default function NavbarComponent() {
           </NavbarItem>
 
           <NavbarItem>
-            <Link color="foreground" href="/dashboard/managment">
+            <Link color="foreground" href="/dashboard/management">
               Управление
             </Link>
           </NavbarItem>
@@ -111,7 +111,7 @@ export default function NavbarComponent() {
         <Divider orientation="vertical" />
         <NavbarContent justify="end">
           <NavbarItem>
-            <Button variant="bordered" color="danger" radius="sm" onClick={() => signOut()}>
+            <Button variant="bordered" color="danger" radius="sm" onClick={() => signOut({ callbackUrl: 'https://google.com/auth/login' })}>
               Выйти
             </Button>
           </NavbarItem>
