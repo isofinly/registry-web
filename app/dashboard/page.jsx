@@ -58,6 +58,7 @@ import {
   EditDocumentIcon,
   DeleteDocumentIcon,
 } from "../components/icons.tsx";
+import axios from "axios";
 
 export default function Page() {
   const fetcher = (...args) => fetch(...args).then((res) => res.json());
@@ -66,7 +67,7 @@ export default function Page() {
   });
 
 
-  const users = React.useMemo(() => data?.results || [], [data]);
+  const discount = React.useMemo(() => data?.results || [], [data]);
 
 
 
@@ -87,6 +88,130 @@ export default function Page() {
     }, 1000);
     return () => clearInterval(interval);
   }, []);
+
+  const [value, setValue] = React. useState (0);
+
+  const [dataCreat, setDataCreat] = useState({
+    id: "new",
+    name: "",
+    value: "",
+    sex: "",
+    age: "",
+    time_active: {
+      start: "",
+      end: ""
+    },
+    status: "",
+    izk: "",
+    card_data: ""
+  });
+
+  function sendDataCreate() {
+
+      axios
+          .post(proccess.env.API_POST_URL, dataCreat)
+          .then((response) => {
+            console.log(response.data);
+          })
+          .catch((error) => {
+            console.error(error);
+          });
+
+  }
+
+  const [dataChange, setDataChange] = useState({
+    id: value.id,
+    name: "",
+    value: "",
+    sex: "",
+    age: "",
+    time_active: {
+      start: "",
+      end: ""
+    },
+    status: "",
+    izk: "",
+    card_data: ""
+  });
+
+  function sendDataChange() {
+
+      axios
+          .post(proccess.env.API_POST_URL, dataChange)
+          .then((response) => {
+            console.log(response.data);
+          })
+          .catch((error) => {
+            console.error(error);
+          });
+
+  }
+
+  const [dataDelete, setDataDelete] = useState({
+    id: value
+  });
+
+  function sendDataDelete() {
+
+      axios
+          .post(proccess.env.API_POST_URL, dataDelete)
+          .then((response) => {
+            console.log(response.data);
+          })
+          .catch((error) => {
+            console.error(error);
+          });
+
+  }
+
+  const [dataAddDiscount, setDataAddDiscount] = useState({
+    idPeople: "",
+    idCard: "",
+    idDiscount: ""
+  });
+
+  function sendDataAddDiscount() {
+      axios
+          .post(proccess.env.API_POST_URL, dataAddDiscount)
+          .then((response) => {
+            console.log(response.data);
+          })
+          .catch((error) => {
+            console.error(error);
+          });
+
+  }
+
+  const [dataAddPersonalDiscount, setDataAddPersonalDiscount] = useState({
+    idPeople: "",
+    id: "new",
+    name: "",
+    value: "",
+    sex: "М/Ж",
+    age: "0+",
+    time_active: {
+      start: "",
+      end: "-"
+    },
+    status: "pause",
+    izk: false,
+    card_data: [
+      { card_number: ""}
+    ]
+  });
+
+  function sendDataAddPersonalDiscount() {
+
+      axios
+          .post(proccess.env.API_POST_URL, dataAddPersonalDiscount)
+          .then((response) => {
+            console.log(response.data);
+          })
+          .catch((error) => {
+            console.error(error);
+          });
+
+  }
 
 
   return (
@@ -191,6 +316,21 @@ export default function Page() {
                           selectedKey={selected}
                           onSelectionChange={setSelected}
                         >
+
+                        {/*  const [dataCreat, setDataCreat] = useState({*/}
+                        {/*  id: "new",*/}
+                        {/*  name: "",*/}
+                        {/*  value: "",*/}
+                        {/*  sex: "",*/}
+                        {/*  age: "",*/}
+                        {/*  time_active: {*/}
+                        {/*  start: "",*/}
+                        {/*  end: ""*/}
+                        {/*},*/}
+                        {/*  status: "",*/}
+                        {/*  izk: "",*/}
+                        {/*  card_data: ""*/}
+                        {/*});*/}
                           <Tab key="new-discount" title="Создать скидку">
                             <div className="flex flex-col gap-4">
                               <Input
@@ -198,80 +338,288 @@ export default function Page() {
                                 label="Название"
                                 placeholder="Введите название скидки"
                                 type="text"
+                                value={dataCreat.name}
+                                onChange={(e) => {
+                                  setDataCreat({
+                                    ...dataCreat,
+                                    name: e.target.value,
+                                  });
+                                }}
                               />
                               <Input
                                 isRequired
                                 label="Скидка"
                                 placeholder="Введите значение без %"
                                 type="text"
+                                value={dataCreat.value}
+                                onChange={(e) => {
+                                  setDataCreat({
+                                    ...dataCreat,
+                                    value: e.target.value,
+                                  });
+                                }}
                               />
                               <Input
                                   isRequired
                                   label="Пол"
                                   placeholder="Введите пол"
                                   type="text"
+                                  value={dataCreat.sex}
+                                  onChange={(e) => {
+                                    setDataCreat({
+                                      ...dataCreat,
+                                      sex: e.target.value,
+                                    });
+                                  }}
                               />
                               <Input
                                   isRequired
                                   label="Возраст"
                                   placeholder="Введите возраст"
                                   type="text"
+                                  value={dataCreat.age}
+                                  onChange={(e) => {
+                                    setDataCreat({
+                                      ...dataCreat,
+                                      age: e.target.value,
+                                    });
+                                  }}
                               />
                               <Input
                                   isRequired
                                   label="Дата активации"
                                   placeholder="Введите дату активации"
                                   type="date"
+                                  value={dataCreat.time_active.start}
+                                  onChange={(e) => {
+                                    setDataCreat({
+                                      ...dataCreat,
+                                      start: e.target.value,
+                                    });
+                                  }}
+                              />
+                              <Input
+                                  isRequired
+                                  label="Дата окончания"
+                                  placeholder="Введите дату окончания"
+                                  type="date"
+                                  value={dataCreat.time_active.end}
+                                  onChange={(e) => {
+                                    setDataCreat({
+                                      ...dataCreat,
+                                      end: e.target.value,
+                                    });
+                                  }}
                               />
                               <Input
                                   isRequired
                                   label="ЕКЖ"
                                   placeholder="Enter "
                                   type="checkbox"
+                                  value={dataCreat.izk}
+                                  onChange={(e) => {
+                                    setDataCreat({
+                                      ...dataCreat,
+                                      izk: e.target.value,
+                                    });
+                                  }}
                               />
                               <div className="flex gap-2 justify-end">
-                                <Button fullWidth color="primary">
+                                <Button fullWidth color="primary"
+                                        onPress={sendDataCreate}>
                                   Создать
                                 </Button>
                               </div>
                             </div>
                           </Tab>
 
-                          <Tab key="Add-discount" title="Добваить скидку человеку">
+                          <Tab key="change-discount" title="Изменить скидку">
+                            <div className="flex flex-col gap-4">
+                              <Select
+                                  label="Скидка"
+                                  placeholder="Выбрать "
+                                  selectedKeys={discount.name}
+                                  value={discount.name}
+                                  selectKeys = {value}
+                                  onSelectionChange={setValue}
+                              >
+                                {discount.map((discount_sel) => (
+                                    <SelectItem key={discount_sel.name} value={discount_sel.name}>
+                                      {discount_sel.name}
+                                    </SelectItem>
+                                ))}
+                              </Select>
+                              <Input
+                                  isRequired
+                                  label="Название"
+                                  placeholder="Введите название скидки"
+                                  type="text"
+                                  value={dataChange.name}
+                                  onChange={(e) => {
+                                    setDataChange({
+                                      ...dataChange,
+                                      name: e.target.value,
+                                    });
+                                  }}
+                              />
+                              <Input
+                                  isRequired
+                                  label="Скидка"
+                                  placeholder="Введите значение без %"
+                                  type="text"
+                                  value={dataChange.value}
+                                  onChange={(e) => {
+                                    setDataChange({
+                                      ...dataChange,
+                                      value: e.target.value,
+                                    });
+                                  }}
+                              />
+                              <Input
+                                  isRequired
+                                  label="Пол"
+                                  placeholder="Введите пол"
+                                  type="text"
+                                  value={dataChange.sex}
+                                  onChange={(e) => {
+                                    setDataChange({
+                                      ...dataChange,
+                                      sex: e.target.value,
+                                    });
+                                  }}
+                              />
+                              <Input
+                                  isRequired
+                                  label="Возраст"
+                                  placeholder="Введите возраст"
+                                  type="text"
+                                  value={dataChange.age}
+                                  onChange={(e) => {
+                                    setDataChange({
+                                      ...dataChange,
+                                      age: e.target.value,
+                                    });
+                                  }}
+                              />
+                              <Input
+                                  isRequired
+                                  label="Дата активации"
+                                  placeholder="Введите дату активации"
+                                  type="date"
+                                  value={dataChange.time_active.start}
+                                  onChange={(e) => {
+                                    setDataChange({
+                                      ...dataChange,
+                                      start: e.target.value,
+                                    });
+                                  }}
+                              />
+                              <Input
+                                  isRequired
+                                  label="Дата окончания"
+                                  placeholder="Введите дату окончания"
+                                  type="date"
+                                  value={dataChange.time_active.end}
+                                  onChange={(e) => {
+                                    setDataChange({
+                                      ...dataChange,
+                                      end: e.target.value,
+                                    });
+                                  }}
+                              />
+                              <Input
+                                  isRequired
+                                  label="ЕКЖ"
+                                  placeholder="Enter "
+                                  type="checkbox"
+                                  value={dataChange.izk}
+                                  onChange={(e) => {
+                                    setDataChange({
+                                      ...dataChange,
+                                      izk: e.target.value,
+                                    });
+                                  }}
+                              />
+                              <div className="flex gap-2 justify-end">
+                                <Button fullWidth color="primary"
+                                        onPress={sendDataChange}>
+                                  Изменить
+                                </Button>
+                              </div>
+                            </div>
+                          </Tab>
+
+                          <Tab key="delete-discount" title="Удалить скидку">
+                            <div className="flex flex-col gap-4">
+                              <Select
+                                  label="Скидка"
+                                  placeholder="Выбрать "
+                                  selectedKeys={discount.name}
+                                  value={discount.name}
+                                  selectKeys = {value}
+                                  onSelectionChange={setValue}
+                              >
+                                {discount.map((discount_sel) => (
+                                    <SelectItem key={discount_sel.name} value={discount_sel.name}>
+                                      {discount_sel.name}
+                                    </SelectItem>
+                                ))}
+                              </Select>
+                              <div className="flex gap-2 justify-end">
+                                <Button fullWidth color="primary"
+                                        onPress={sendDataDelete}>
+                                  Удалить
+                                </Button>
+                              </div>
+                            </div>
+                          </Tab>
+
+                          <Tab key="Add-discount" title="Добавить скидку человеку">
                             <div className="flex flex-col gap-4 h-[300px]">
                               <Input
                                 isRequired
                                 label="Индефикатор человека"
                                 placeholder="Введите индефикатор"
                                 type="text"
+                                value={dataAddDiscount.idPeople}
+                                onChange={(e) => {
+                                  setDataAddDiscount({
+                                    ...dataAddDiscount,
+                                    idPeople: e.target.value,
+                                  });
+                                }}
                               />
                               <Input
                                 isRequired
                                 label="Индефикатор карты"
                                 placeholder="Введите индефикатор карты"
                                 type="text"
+                                value={dataAddDiscount.idCard}
+                                onChange={(e) => {
+                                  setDataAddDiscount({
+                                    ...dataAddDiscount,
+                                    idCard: e.target.value,
+                                  });
+                                }}
                               />
                               <Select
                                   label="Скидка"
                                   placeholder="Выбрать "
+                                  selectedKeys={discount.name}
+                                  value={discount.name}
+                                  selectKeys = {value}
+                                  onSelectionChange={setValue}
                               >
-                                {users.map((user) => (
-                                    <SelectItem key={user.name} value={user.name}>
-                                      {user.name}
+                                {discount.map((discount_sel) => (
+                                    <SelectItem key={discount_sel.name} value={discount_sel.name}>
+                                      {discount_sel.name}
                                     </SelectItem>
                                 ))}
                               </Select>
 
 
-                              <Input
-                                isRequired
-                                label="Активация скидки"
-                                placeholder="Enter "
-                                type="date"
-                              />
-
                               <div className="flex gap-2 justify-end">
-                                <Button fullWidth color="primary">
+                                <Button fullWidth color="primary" onPress={sendDataAddDiscount}>
                                   Добавить
                                 </Button>
                               </div>
@@ -285,37 +633,56 @@ export default function Page() {
                                   label="Индефикатор человека"
                                   placeholder="Введите индефикатор человека"
                                   type="text"
+                                  value={dataAddPersonalDiscount.idPeople}
+                                  onChange={(e) => {
+                                    setDataAddPersonalDiscount({
+                                      ...dataAddPersonalDiscount,
+                                      idPeople: e.target.value,
+                                    });
+                                  }}
                               />
                               <Input
                                   isRequired
                                   label="Индефикатор карты"
                                   placeholder="Введите индефикатор карты"
                                   type="text"
+                                  value={dataAddPersonalDiscount.card_data.card_number}
+                                  onChange={(e) => {
+                                    setDataAddPersonalDiscount({
+                                      ...dataAddPersonalDiscount,
+                                      card_number: e.target.value,
+                                    });
+                                  }}
                               />
                               <Input
                                   isRequired
                                   label="Название"
                                   placeholder="Введите название скидки"
                                   type="text"
+                                  value={dataAddPersonalDiscount.name}
+                                  onChange={(e) => {
+                                    setDataAddPersonalDiscount({
+                                      ...dataAddPersonalDiscount,
+                                      name: e.target.value,
+                                    });
+                                  }}
                               />
                               <Input
                                   isRequired
                                   label="Скидка"
                                   placeholder="Введите скидку без %"
                                   type="text"
-                              />
-
-
-
-                              <Input
-                                  isRequired
-                                  label="Активировать с"
-                                  placeholder="Enter "
-                                  type="date"
+                                  value={dataAddPersonalDiscount.value}
+                                  onChange={(e) => {
+                                    setDataAddPersonalDiscount({
+                                      ...dataAddPersonalDiscount,
+                                      value: e.target.value,
+                                    });
+                                  }}
                               />
 
                               <div className="flex gap-2 justify-end">
-                                <Button fullWidth color="primary">
+                                <Button fullWidth color="primary" onPress={sendDataAddPersonalDiscount}>
                                   Добавить
                                 </Button>
                               </div>

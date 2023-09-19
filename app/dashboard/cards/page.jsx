@@ -80,7 +80,7 @@ export default function App() {
   const [page, setPage] = React.useState(1);
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
-  const { data, isLoading } = useSWR(`/discount.json`, fetcher, {
+  const { data, isLoading } = useSWR(proccess.env.API_GET_URL, fetcher, {
     keepPreviousData: true,
   });
 
@@ -290,7 +290,7 @@ export default function App() {
           <Input
             isClearable
             className="w-full sm:max-w-[44%]"
-            placeholder="Поиск по ФИО..."
+            placeholder="Поиск по названию..."
             startContent={<SearchIcon />}
             value={filterValue}
             onClear={() => onClear()}
@@ -345,9 +345,6 @@ export default function App() {
                 ))}
               </DropdownMenu>
             </Dropdown>
-            <Button color="primary" endContent={<PlusIcon />}>
-              Добавить
-            </Button>
           </div>
         </div>
         <div className="flex justify-between items-center">
