@@ -1,21 +1,19 @@
 "use client";
 import React from "react";
+import useSWR from "swr";
+// icons
 import {
   SearchIcon,
   ChevronDownIcon,
-  PlusIcon,
-  EyeIcon,
-  DeleteIcon,
-} from "../../components/icons";
+} from "@components/icons";
 import BlockIcon from "@mui/icons-material/Block";
-import { columns, statusOptions } from "../../utils/cardsData";
-import { capitalize } from "../../utils/utils";
 import EditIcon from "@mui/icons-material/Edit";
 import PublishIcon from "@mui/icons-material/Publish";
 import GetAppIcon from "@mui/icons-material/GetApp";
-
-import useSWR from "swr";
-
+// misc
+import { columns, statusOptions } from "@utils/cardsData";
+import { capitalize } from "@utils/utils";
+// ui
 import {
   Table,
   TableHeader,
@@ -36,10 +34,7 @@ import {
   ChipProps,
   Tooltip,
   SortDescriptor,
-  Spinner,
-} from "@nextui-org/react";
-
-import {
+  Spinner, 
   Modal,
   ModalContent,
   ModalHeader,
@@ -47,13 +42,12 @@ import {
   ModalFooter,
   useDisclosure,
 } from "@nextui-org/react";
-
+// cfgs
 const statusColorMap = {
   active: "success",
   blocked: "danger",
   suspended: "warning",
 };
-
 const INITIAL_VISIBLE_COLUMNS = [
   "id",
   "card_id",
@@ -141,6 +135,37 @@ export default function App() {
     });
   }, [sortDescriptor, items]);
 
+  const onNextPage = React.useCallback(() => {
+    if (page < pages) {
+      setPage(page + 1);
+    }
+  }, [page, pages]);
+
+  const onPreviousPage = React.useCallback(() => {
+    if (page > 1) {
+      setPage(page - 1);
+    }
+  }, [page]);
+
+  const onRowsPerPageChange = React.useCallback((e) => {
+    setRowsPerPage(Number(e.target.value));
+    setPage(1);
+  }, []);
+
+  const onSearchChange = React.useCallback((value) => {
+    if (value) {
+      setFilterValue(value);
+      setPage(1);
+    } else {
+      setFilterValue("");
+    }
+  }, []);
+
+  const onClear = React.useCallback(() => {
+    setFilterValue("");
+    setPage(1);
+  }, []);
+
   const renderCell = React.useCallback((user, columnKey) => {
     const cellValue = user[columnKey];
 
@@ -155,15 +180,15 @@ export default function App() {
         return (
           <div className="px-1 py-2">
             <div className="text-small font-bold">
-              Активна до: {cellValue.end}
+              Активна до: {new Date(cellValue.end).toLocaleDateString() + " " + new Date(cellValue.end).toLocaleTimeString()}
             </div>
-            <div className="text-tiny">Активирована: {cellValue.start}</div>
+            <div className="text-tiny">Активирована:{new Date(cellValue.start).toLocaleDateString() + " " + new Date(cellValue.start).toLocaleTimeString()}</div>
           </div>
         );
       case "last_activity":
         return (
           <div className="px-1 py-2">
-            <div className="text-small font-bold">{cellValue}</div>
+            <div className="text-small font-bold">{new Date(cellValue).toLocaleDateString() + " " + new Date(cellValue).toLocaleTimeString()}</div>
           </div>
         );
       case "user":
@@ -224,37 +249,6 @@ export default function App() {
       default:
         return cellValue;
     }
-  }, []);
-
-  const onNextPage = React.useCallback(() => {
-    if (page < pages) {
-      setPage(page + 1);
-    }
-  }, [page, pages]);
-
-  const onPreviousPage = React.useCallback(() => {
-    if (page > 1) {
-      setPage(page - 1);
-    }
-  }, [page]);
-
-  const onRowsPerPageChange = React.useCallback((e) => {
-    setRowsPerPage(Number(e.target.value));
-    setPage(1);
-  }, []);
-
-  const onSearchChange = React.useCallback((value) => {
-    if (value) {
-      setFilterValue(value);
-      setPage(1);
-    } else {
-      setFilterValue("");
-    }
-  }, []);
-
-  const onClear = React.useCallback(() => {
-    setFilterValue("");
-    setPage(1);
   }, []);
 
   const topContent = React.useMemo(() => {

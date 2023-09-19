@@ -261,7 +261,7 @@ export default function Page() {
       <Spacer x={2} />
 
       <div className="grid justify-items-center justify-center">
-        <div className="grid grid-flow-row-dense grid-cols-3 sm:grid-cols-2 md:grid-cols-3 gap-2">
+        <div className="grid grid-flow-row-dense xl:grid-cols-4 sm:grid-cols-2 md:grid-cols-3 gap-2">
           <Card
             isPressable
             disableRipple={true}

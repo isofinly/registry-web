@@ -1,13 +1,11 @@
 "use client";
 import React from "react";
 
-import { DeleteIcon } from "../../components/icons";
-import { EyeIcon } from "../../components/icons";
-import { PlusIcon } from "../../components/icons";
-import { ChevronDownIcon } from "../../components/icons";
-import { SearchIcon } from "../../components/icons";
-import { columns, statusOptions } from "../../utils/benefitData";
-import { capitalize } from "../../utils/utils";
+import { PlusIcon } from "@components/icons";
+import { ChevronDownIcon } from "@components/icons";
+import { SearchIcon } from "@components/icons";
+import { columns, statusOptions } from "@utils/benefitData";
+import { capitalize } from "@utils/utils";
 
 import useSWR from "swr";
 
@@ -40,15 +38,6 @@ import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
 import EditIcon from "@mui/icons-material/Edit";
 import InfoIcon from "@mui/icons-material/Info";
 
-import {
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  useDisclosure,
-} from "@nextui-org/react";
-
 const statusColorMap = {
   active: "success",
   blocked: "danger",
@@ -72,6 +61,7 @@ export default function App() {
   const [visibleColumns, setVisibleColumns] = React.useState(
     new Set(INITIAL_VISIBLE_COLUMNS)
   );
+  const [cardsList, setCardsList] = React.useState(new Set([]));
   const [statusFilter, setStatusFilter] = React.useState("all");
   const [rowsPerPage, setRowsPerPage] = React.useState(15);
   const [sortDescriptor, setSortDescriptor] = React.useState({
@@ -79,8 +69,11 @@ export default function App() {
     direction: "ascending",
   });
   const [page, setPage] = React.useState(1);
-  const { isOpen, onOpen, onOpenChange } = useDisclosure();
+  let globalVariable;
+  const [cardPage, setCardPage] = React.useState(1);
+  const rowsPerCardPage = 20;
 
+  // async fetching block start
   const { data, isLoading } = useSWR(`/benefits.json`, fetcher, {
     keepPreviousData: true,
   });
@@ -89,6 +82,7 @@ export default function App() {
     isLoading || data?.results.length === 0 ? "Загрузка" : "Неактивен";
 
   const benefits = React.useMemo(() => data?.results || [], [data]);
+  // async fetching end
 
   const hasSearchFilter = Boolean(filterValue);
 
@@ -104,13 +98,8 @@ export default function App() {
     let filteredbenefits = [...benefits];
 
     if (hasSearchFilter) {
-      filteredbenefits = filteredbenefits.filter(
-        (benefit) =>
-          benefit.first_name
-            .toLowerCase()
-            .includes(filterValue.toLowerCase()) ||
-          benefit.last_name.toLowerCase().includes(filterValue.toLowerCase()) ||
-          benefit.middle_name.toLowerCase().includes(filterValue.toLowerCase())
+      filteredbenefits = filteredbenefits.filter((benefit) =>
+        benefit.name.toLowerCase().includes(filterValue.toLowerCase())
       );
     }
     if (
@@ -124,8 +113,6 @@ export default function App() {
 
     return filteredbenefits;
   }, [benefits, hasSearchFilter, statusFilter, filterValue]);
-
-  const pages = Math.ceil(filteredItems.length / rowsPerPage);
 
   const items = React.useMemo(() => {
     const start = (page - 1) * rowsPerPage;
@@ -144,7 +131,58 @@ export default function App() {
     });
   }, [sortDescriptor, items]);
 
-  const [cardsList, setCardsList] = React.useState(new Set([]));
+  // cards table
+  const pages = Math.ceil(filteredItems.length / rowsPerPage);
+
+  const cards = React.useMemo(() => {
+    let cardPages = cardsList
+      ? Math.ceil(cardsList.length / rowsPerCardPage)
+      : 1;
+    const start = (cardPage - 1) * rowsPerCardPage;
+    const end = start + rowsPerCardPage;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    globalVariable = cardPages;
+    if (cardsList && cardsList.length > 0) {
+      return cardsList.slice(start, end);
+    } else {
+      return [];
+    }
+  }, [cardsList, cardPage]);
+
+  const renderCardCell = React.useCallback((benefit, columnKey) => {
+    return benefit[columnKey];
+  }, []);
+
+  const onNextPage = React.useCallback(() => {
+    if (page < pages) {
+      setPage(page + 1);
+    }
+  }, [page, pages]);
+
+  const onPreviousPage = React.useCallback(() => {
+    if (page > 1) {
+      setPage(page - 1);
+    }
+  }, [page]);
+
+  const onRowsPerPageChange = React.useCallback((e) => {
+    setRowsPerPage(Number(e.target.value));
+    setPage(1);
+  }, []);
+
+  const onSearchChange = React.useCallback((value) => {
+    if (value) {
+      setFilterValue(value);
+      setPage(1);
+    } else {
+      setFilterValue("");
+    }
+  }, []);
+
+  const onClear = React.useCallback(() => {
+    setFilterValue("");
+    setPage(1);
+  }, []);
 
   const renderCell = React.useCallback((benefit, columnKey) => {
     const cellValue = benefit[columnKey];
@@ -237,45 +275,14 @@ export default function App() {
     }
   }, []);
 
-  const onNextPage = React.useCallback(() => {
-    if (page < pages) {
-      setPage(page + 1);
-    }
-  }, [page, pages]);
-
-  const onPreviousPage = React.useCallback(() => {
-    if (page > 1) {
-      setPage(page - 1);
-    }
-  }, [page]);
-
-  const onRowsPerPageChange = React.useCallback((e) => {
-    setRowsPerPage(Number(e.target.value));
-    setPage(1);
-  }, []);
-
-  const onSearchChange = React.useCallback((value) => {
-    if (value) {
-      setFilterValue(value);
-      setPage(1);
-    } else {
-      setFilterValue("");
-    }
-  }, []);
-
-  const onClear = React.useCallback(() => {
-    setFilterValue("");
-    setPage(1);
-  }, []);
-
-  const topContent = React.useMemo(() => {
+const topContent = React.useMemo(() => {
     return (
       <div className="flex flex-col gap-4">
         <div className="flex justify-between gap-3 items-end">
           <Input
             isClearable
             className="w-full sm:max-w-[44%]"
-            placeholder="Поиск по ФИО..."
+            placeholder="Поиск по названию ..."
             startContent={<SearchIcon />}
             value={filterValue}
             onClear={() => onClear()}
@@ -337,10 +344,10 @@ export default function App() {
         </div>
         <div className="flex justify-between items-center">
           <span className="text-default-400 text-small">
-            Всего {benefits.length} пользователей
+            Всего {benefits.length} льгот
           </span>
           <label className="flex items-center text-default-400 text-small">
-            Количество строк:
+            Количество строк льгот:
             <select
               className="bg-transparent outline-none text-default-400 text-small"
               onChange={onRowsPerPageChange}
@@ -405,32 +412,9 @@ export default function App() {
     onNextPage,
   ]);
 
-  let globalVariable;
-
-  const [cardPage, setCardPage] = React.useState(1);
-  const rowsPerCardPage = 20;
-
-  const cards = React.useMemo(() => {
-    let cardPages = cardsList
-      ? Math.ceil(cardsList.length / rowsPerCardPage)
-      : 1;
-    const start = (cardPage - 1) * rowsPerCardPage;
-    const end = start + rowsPerCardPage;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    globalVariable = cardPages;
-    if (cardsList && cardsList.length > 0) {
-      return cardsList.slice(start, end);
-    } else {
-      return []; // Return an empty array or any other default value
-    }
-  }, [cardsList, cardPage]);
-
-  const renderCardCell = React.useCallback((benefit, columnKey) => {
-    return benefit[columnKey];
-  }, []);
-
   return (
-    // <div className="flex justify-items-center justify-center">
+    <div className="grid gap-2 ">
+      {topContent}
     <div className="flex justify-center grid-flow-row-dense grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-2 ">
       <Table
         className="col-span-1"
@@ -441,10 +425,7 @@ export default function App() {
         classNames={{
           wrapper: "max-h-[calc(95vh-200px)]",
         }}
-        // selectedKeys={selectedKeys}
-        // selectionMode="multiple"
         sortDescriptor={sortDescriptor}
-        topContent={topContent}
         topContentPlacement="outside"
         onSelectionChange={setSelectedKeys}
         onSortChange={setSortDescriptor}
@@ -492,12 +473,12 @@ export default function App() {
           </div>
         }
         classNames={{
-          wrapper: "min-h-[222px]",
+          wrapper: `min-h-[222px]`,
         }}
       >
         <TableHeader>
-          <TableColumn key="card_number">Номер</TableColumn>
-          <TableColumn key="card_id">ID</TableColumn>
+          <TableColumn key="card_number">Номер карты</TableColumn>
+          <TableColumn key="card_id">ID карты</TableColumn>
         </TableHeader>
         <TableBody items={cards}>
           {(item) => (
@@ -510,6 +491,6 @@ export default function App() {
         </TableBody>
       </Table>
     </div>
-    // </div>
+    </div>
   );
 }

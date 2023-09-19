@@ -1,16 +1,15 @@
 "use client";
 import React from "react";
-
-import { DeleteIcon } from "../../components/icons";
-import { EyeIcon } from "../../components/icons";
-import { PlusIcon } from "../../components/icons";
-import { ChevronDownIcon } from "../../components/icons";
-import { SearchIcon } from "../../components/icons";
-import { columns, statusOptions } from "../../utils/userData";
-import { capitalize } from "../../utils/utils";
-
 import useSWR from "swr";
-
+// misc
+import { capitalize } from "@utils/utils";
+import { columns, statusOptions } from "@utils/userData";
+// icons
+import { PlusIcon, ChevronDownIcon, SearchIcon } from "@components/icons";
+import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
+import EditIcon from "@mui/icons-material/Edit";
+import InfoIcon from "@mui/icons-material/Info";
+// ui 
 import {
   Table,
   TableHeader,
@@ -32,13 +31,6 @@ import {
   Tooltip,
   SortDescriptor,
   Spinner,
-} from "@nextui-org/react";
-
-import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
-import EditIcon from "@mui/icons-material/Edit";
-import InfoIcon from "@mui/icons-material/Info";
-
-import {
   Modal,
   ModalContent,
   ModalHeader,
@@ -46,13 +38,12 @@ import {
   ModalFooter,
   useDisclosure,
 } from "@nextui-org/react";
-
+// cfgs
 const statusColorMap = {
   active: "success",
   paused: "danger",
   suspended: "warning",
 };
-
 const INITIAL_VISIBLE_COLUMNS = [
   "first_name",
   "middle_name",
@@ -80,7 +71,7 @@ export default function App() {
   });
   const [page, setPage] = React.useState(1);
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
-
+  // async block start
   const { data, isLoading } = useSWR(`/users.json`, fetcher, {
     keepPreviousData: true,
   });
@@ -89,7 +80,7 @@ export default function App() {
     isLoading || data?.results.length === 0 ? "Загрузка" : "Неактивен";
 
   const users = React.useMemo(() => data?.results || [], [data]);
-
+  // async block end
   const hasSearchFilter = Boolean(filterValue);
 
   const headerColumns = React.useMemo(() => {
@@ -141,6 +132,37 @@ export default function App() {
       return sortDescriptor.direction === "descending" ? -cmp : cmp;
     });
   }, [sortDescriptor, items]);
+
+  const onNextPage = React.useCallback(() => {
+    if (page < pages) {
+      setPage(page + 1);
+    }
+  }, [page, pages]);
+
+  const onPreviousPage = React.useCallback(() => {
+    if (page > 1) {
+      setPage(page - 1);
+    }
+  }, [page]);
+
+  const onRowsPerPageChange = React.useCallback((e) => {
+    setRowsPerPage(Number(e.target.value));
+    setPage(1);
+  }, []);
+
+  const onSearchChange = React.useCallback((value) => {
+    if (value) {
+      setFilterValue(value);
+      setPage(1);
+    } else {
+      setFilterValue("");
+    }
+  }, []);
+
+  const onClear = React.useCallback(() => {
+    setFilterValue("");
+    setPage(1);
+  }, []);
 
   const renderCell = React.useCallback((user, columnKey) => {
     const cellValue = user[columnKey];
@@ -234,37 +256,6 @@ export default function App() {
       default:
         return cellValue;
     }
-  }, []);
-
-  const onNextPage = React.useCallback(() => {
-    if (page < pages) {
-      setPage(page + 1);
-    }
-  }, [page, pages]);
-
-  const onPreviousPage = React.useCallback(() => {
-    if (page > 1) {
-      setPage(page - 1);
-    }
-  }, [page]);
-
-  const onRowsPerPageChange = React.useCallback((e) => {
-    setRowsPerPage(Number(e.target.value));
-    setPage(1);
-  }, []);
-
-  const onSearchChange = React.useCallback((value) => {
-    if (value) {
-      setFilterValue(value);
-      setPage(1);
-    } else {
-      setFilterValue("");
-    }
-  }, []);
-
-  const onClear = React.useCallback(() => {
-    setFilterValue("");
-    setPage(1);
   }, []);
 
   const topContent = React.useMemo(() => {

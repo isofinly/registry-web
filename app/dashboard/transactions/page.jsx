@@ -1,19 +1,20 @@
 "use client";
 import React from "react";
+import useSWR from "swr";
+// icons
 import {
   SearchIcon,
   ChevronDownIcon,
   PlusIcon,
   EyeIcon,
   DeleteIcon,
-} from "../../components/icons";
-import BlockIcon from "@mui/icons-material/Block";
-import { columns, statusOptions } from "../../utils/transactionData";
-import { capitalize } from "../../utils/utils";
+} from "@components/icons";
 import EditIcon from "@mui/icons-material/Edit";
-
-import useSWR from "swr";
-
+import BlockIcon from "@mui/icons-material/Block";
+// misc
+import { columns, statusOptions } from "@utils/transactionData";
+import { capitalize } from "@utils/utils";
+// ui
 import {
   Table,
   TableHeader,
@@ -36,22 +37,12 @@ import {
   SortDescriptor,
   Spinner,
 } from "@nextui-org/react";
-
-import {
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  useDisclosure,
-} from "@nextui-org/react";
-
+// cfgs
 const statusColorMap = {
   completed: "success",
   blocked: "danger",
   suspended: "warning",
 };
-
 const INITIAL_VISIBLE_COLUMNS = [
   "id",
   "time",
@@ -64,7 +55,7 @@ const INITIAL_VISIBLE_COLUMNS = [
   "state",
   "actions",
 ];
-
+// async fetcher
 const fetcher = (...args) => fetch(...args).then((res) => res.json());
 
 export default function App() {
@@ -80,8 +71,7 @@ export default function App() {
     direction: "ascending",
   });
   const [page, setPage] = React.useState(1);
-  const { isOpen, onOpen, onOpenChange } = useDisclosure();
-
+  // async load block
   const { data, isLoading } = useSWR(`/transactionData.json`, fetcher, {
     keepPreviousData: true,
   });
@@ -90,6 +80,7 @@ export default function App() {
     isLoading || data?.results.length === 0 ? "Загрузка" : "Неактивен";
 
   const transactions = React.useMemo(() => data?.results || [], [data]);
+  // async block end
 
   const hasSearchFilter = Boolean(filterValue);
 
@@ -140,6 +131,37 @@ export default function App() {
     });
   }, [sortDescriptor, items]);
 
+  const onNextPage = React.useCallback(() => {
+    if (page < pages) {
+      setPage(page + 1);
+    }
+  }, [page, pages]);
+
+  const onPreviousPage = React.useCallback(() => {
+    if (page > 1) {
+      setPage(page - 1);
+    }
+  }, [page]);
+
+  const onRowsPerPageChange = React.useCallback((e) => {
+    setRowsPerPage(Number(e.target.value));
+    setPage(1);
+  }, []);
+
+  const onSearchChange = React.useCallback((value) => {
+    if (value) {
+      setFilterValue(value);
+      setPage(1);
+    } else {
+      setFilterValue("");
+    }
+  }, []);
+
+  const onClear = React.useCallback(() => {
+    setFilterValue("");
+    setPage(1);
+  }, []);
+
   const renderCell = React.useCallback((user, columnKey) => {
     const cellValue = user[columnKey];
 
@@ -147,7 +169,11 @@ export default function App() {
       case "id":
         return cellValue;
       case "time":
-        return cellValue;
+        return (
+          new Date(cellValue).toLocaleDateString() +
+          " " +
+          new Date(cellValue).toLocaleTimeString()
+        );
       case "amount":
         return cellValue;
       case "benefit":
@@ -199,7 +225,7 @@ export default function App() {
           <div className="relative flex items-center gap-2">
             <Tooltip content="Изменить статус">
               <Button
-              size="sm"
+                size="sm"
                 isIconOnly
                 color="primary"
                 aria-label="edit"
@@ -210,7 +236,7 @@ export default function App() {
             </Tooltip>
             <Tooltip color="danger" content="Заблокировать">
               <Button
-              size="sm"
+                size="sm"
                 isIconOnly
                 color="danger"
                 aria-label="block"
@@ -224,37 +250,6 @@ export default function App() {
       default:
         return cellValue;
     }
-  }, []);
-
-  const onNextPage = React.useCallback(() => {
-    if (page < pages) {
-      setPage(page + 1);
-    }
-  }, [page, pages]);
-
-  const onPreviousPage = React.useCallback(() => {
-    if (page > 1) {
-      setPage(page - 1);
-    }
-  }, [page]);
-
-  const onRowsPerPageChange = React.useCallback((e) => {
-    setRowsPerPage(Number(e.target.value));
-    setPage(1);
-  }, []);
-
-  const onSearchChange = React.useCallback((value) => {
-    if (value) {
-      setFilterValue(value);
-      setPage(1);
-    } else {
-      setFilterValue("");
-    }
-  }, []);
-
-  const onClear = React.useCallback(() => {
-    setFilterValue("");
-    setPage(1);
   }, []);
 
   const topContent = React.useMemo(() => {
