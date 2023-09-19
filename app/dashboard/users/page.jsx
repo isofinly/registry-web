@@ -75,7 +75,7 @@ export default function App() {
     direction: "ascending",
   });
   const [page, setPage] = React.useState(1);
-  const { data, isLoading } = useSWR(`/users.json`, fetcher, {
+  const { data, isLoading } = useSWR(proccess.env.API_GET_URL, fetcher, {
     keepPreviousData: true,
   });
 

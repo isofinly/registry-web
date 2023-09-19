@@ -67,7 +67,7 @@ export default function App() {
   });
   const [page, setPage] = React.useState(1);
 
-  const { data, isLoading } = useSWR(`/cards.json`, fetcher, {
+  const { data, isLoading } = useSWR(proccess.env.API_GET_URL, fetcher, {
     keepPreviousData: true,
   });
 
