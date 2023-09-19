@@ -118,7 +118,7 @@ export default function Page() {
                     key="new"
                     startContent={<AddIcon className={iconClasses} />}
                   >
-                    New discount
+                    Новая скидка
                   </ListboxItem>
                   <ListboxItem
                     key="copy"
@@ -181,7 +181,7 @@ export default function Page() {
                   {(onClose) => (
                     <>
                       <ModalHeader className="flex flex-col gap-1">
-                        Discounts
+                        Скидки
                       </ModalHeader>
                       <ModalBody>
                         <Tabs
@@ -191,36 +191,36 @@ export default function Page() {
                           selectedKey={selected}
                           onSelectionChange={setSelected}
                         >
-                          <Tab key="new-discount" title="Create discount">
+                          <Tab key="new-discount" title="Создать скидку">
                             <div className="flex flex-col gap-4">
                               <Input
                                 isRequired
-                                label="Name"
-                                placeholder="Enter name for discount"
+                                label="Название"
+                                placeholder="Введите название скидки"
                                 type="text"
                               />
                               <Input
                                 isRequired
-                                label="Value"
-                                placeholder="Enter value without %"
+                                label="Скидка"
+                                placeholder="Введите значение без %"
                                 type="text"
                               />
                               <Input
                                   isRequired
-                                  label="Sex"
-                                  placeholder="Enter gender"
+                                  label="Пол"
+                                  placeholder="Введите пол"
                                   type="text"
                               />
                               <Input
                                   isRequired
-                                  label="Age"
-                                  placeholder="Enter age"
+                                  label="Возраст"
+                                  placeholder="Введите возраст"
                                   type="text"
                               />
                               <Input
                                   isRequired
-                                  label="Active"
-                                  placeholder="Enter date and time. Ex: 12.04.2004/12:00"
+                                  label="Дата активации"
+                                  placeholder="Введите дату активации"
                                   type="date"
                               />
                               <Input
@@ -231,29 +231,29 @@ export default function Page() {
                               />
                               <div className="flex gap-2 justify-end">
                                 <Button fullWidth color="primary">
-                                  Create
+                                  Создать
                                 </Button>
                               </div>
                             </div>
                           </Tab>
 
-                          <Tab key="Add-discount" title="Add discount for person">
+                          <Tab key="Add-discount" title="Добваить скидку человеку">
                             <div className="flex flex-col gap-4 h-[300px]">
                               <Input
                                 isRequired
-                                label="Person ID"
-                                placeholder="Enter person ID"
+                                label="Индефикатор человека"
+                                placeholder="Введите индефикатор"
                                 type="text"
                               />
                               <Input
                                 isRequired
-                                label="ID card"
-                                placeholder="Enter ID card"
+                                label="Индефикатор карты"
+                                placeholder="Введите индефикатор карты"
                                 type="text"
                               />
                               <Select
-                                  label="Discount"
-                                  placeholder="Select "
+                                  label="Скидка"
+                                  placeholder="Выбрать "
                               >
                                 {users.map((user) => (
                                     <SelectItem key={user.name} value={user.name}>
@@ -265,43 +265,43 @@ export default function Page() {
 
                               <Input
                                 isRequired
-                                label="Activate since"
-                                placeholder="Enter period activate"
+                                label="Активация скидки"
+                                placeholder="Enter "
                                 type="date"
                               />
 
                               <div className="flex gap-2 justify-end">
                                 <Button fullWidth color="primary">
-                                  Add
+                                  Добавить
                                 </Button>
                               </div>
                             </div>
                           </Tab>
 
-                          <Tab key="individual-discount" title="Add individual discount">
+                          <Tab key="individual-discount" title="Создать индивидуальную скидку">
                             <div className="flex flex-col gap-4 ">
                               <Input
                                   isRequired
-                                  label="Person ID"
-                                  placeholder="Enter person ID"
+                                  label="Индефикатор человека"
+                                  placeholder="Введите индефикатор человека"
                                   type="text"
                               />
                               <Input
                                   isRequired
-                                  label="ID card"
-                                  placeholder="Enter ID card"
+                                  label="Индефикатор карты"
+                                  placeholder="Введите индефикатор карты"
                                   type="text"
                               />
                               <Input
                                   isRequired
-                                  label="Name"
-                                  placeholder="Enter name for discount"
+                                  label="Название"
+                                  placeholder="Введите название скидки"
                                   type="text"
                               />
                               <Input
                                   isRequired
-                                  label="Value"
-                                  placeholder="Enter value without %"
+                                  label="Скидка"
+                                  placeholder="Введите скидку без %"
                                   type="text"
                               />
 
@@ -309,14 +309,14 @@ export default function Page() {
 
                               <Input
                                   isRequired
-                                  label="Activate since"
-                                  placeholder="Enter period activate"
+                                  label="Активировать с"
+                                  placeholder="Enter "
                                   type="date"
                               />
 
                               <div className="flex gap-2 justify-end">
                                 <Button fullWidth color="primary">
-                                  Add
+                                  Добавить
                                 </Button>
                               </div>
                             </div>
@@ -333,7 +333,7 @@ export default function Page() {
                             variant="flat"
                             onPress={onClose}
                           >
-                            Close
+                            Закрыть
                           </Button>
                           <Button color="" variant="bordered" onPress={onClose}>
                             Справка
@@ -353,7 +353,7 @@ export default function Page() {
           >
             <CardHeader className="pb-0 pt-2 px-4 flex-col items-start">
               <p className="text-tiny uppercase font-bold">
-                Информация о пользователях
+                Информация о скидках
               </p>
               <h4 className="font-bold text-large">
                 Количество, последние изменения
@@ -423,7 +423,7 @@ export default function Page() {
           >
             <CardHeader className="pb-0 pt-2 px-4 flex-col items-start">
               <p className="text-tiny uppercase font-bold">
-                Социальные пособия
+                Пользователи
               </p>
               <h4 className="font-bold text-large">Краткая сводка</h4>
             </CardHeader>
@@ -561,7 +561,7 @@ export default function Page() {
           >
             <CardHeader className="pb-0 pt-2 px-4 flex-col items-start">
               <p className="text-tiny uppercase font-bold">
-                Статистика транзакций
+                Статистика карт
               </p>
               <h4 className="font-bold text-large">
                 Количество, последние замороженные
