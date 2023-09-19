@@ -6,6 +6,7 @@ const columns = [
     { name: "Возраст", uid: "age"},
     { name: "Срок годности", uid: "time_active"},
     { name: "Статус", uid: "status", sortable: true  },
+    { name: "ЕКЖ", uid: "izk", sortable: true  },
     { name: "Действия", uid: "actions" },
 ];
 
