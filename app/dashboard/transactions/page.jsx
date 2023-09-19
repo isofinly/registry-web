@@ -72,7 +72,7 @@ export default function App() {
   });
   const [page, setPage] = React.useState(1);
   // async load block
-  const { data, isLoading } = useSWR(`/transactionData.json`, fetcher, {
+  const { data, isLoading } = useSWR(process.env.API_GET_URL, fetcher, {
     keepPreviousData: true,
   });
 

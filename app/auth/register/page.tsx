@@ -15,6 +15,7 @@ import {
   ModalBody,
   ModalFooter,
   useDisclosure,
+  Skeleton,
 } from "@nextui-org/react";
 
 import { Input } from "@nextui-org/react";
@@ -56,7 +57,7 @@ const RegisterPage = () => {
     if (response.ok) {
       router.push("/auth/login");
     }
-    if (response.status === 400){
+    if (response.status === 400) {
       setErrorMessage(userInfo.error);
     }
   };
@@ -73,14 +74,16 @@ const RegisterPage = () => {
             <form className="space-y-6" onSubmit={registerUser}>
               <div className="grid grid-cols-3 gap-6 md:gap-4 items-center justify-center">
                 <div className="relative col-span-1 md:col-span-1 grid justify-center">
-                  <Image
-                    alt="QR"
-                    className="object-cover justify-center"
-                    height={100}
-                    shadow="md"
-                    src="/QRdeWP.png"
-                    width="100%"
-                  />
+                  <Skeleton className="rounded-lg">
+                    <Image
+                      alt="QR"
+                      className="object-cover justify-center"
+                      height={100}
+                      shadow="md"
+                      src="/QRdeWP.png"
+                      width="100%"
+                    />
+                  </Skeleton>
                   <Spacer y={2} />
                   <Button color="primary" isLoading className="">
                     Сгенерировать новый QR
@@ -158,9 +161,7 @@ const RegisterPage = () => {
                         <Button
                           color="danger"
                           variant="bordered"
-                          onPress={() =>
-                            (window.location.href = `/auth/login`)
-                          }
+                          onPress={() => (window.location.href = `/auth/login`)}
                         >
                           Вход
                         </Button>

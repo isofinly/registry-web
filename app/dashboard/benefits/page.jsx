@@ -74,7 +74,7 @@ export default function App() {
   const rowsPerCardPage = 20;
 
   // async fetching block start
-  const { data, isLoading } = useSWR(`/benefits.json`, fetcher, {
+  const { data, isLoading } = useSWR(process.env.API_GET_URL, fetcher, {
     keepPreviousData: true,
   });
 
