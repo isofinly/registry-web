@@ -1,4 +1,4 @@
-## ORM web-ui
+## ORM web-ui | Main/dev branch
 Set up an .env file depending on your back-end production. 
 
 ``DATABASE_URL="postgresql://postgres:pgpwd@localhost:5432/prismadb?schema=public"``
@@ -15,7 +15,7 @@ For building:
 then
 ``bun run start``
 
-## Partner web-ui
+## Partner web-ui | Partners branch
 
 ``DATABASE_URL="postgresql://postgres:pgpwd@localhost:5432/prismadb?schema=public"``
 
