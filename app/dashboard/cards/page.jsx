@@ -77,7 +77,7 @@ export default function App() {
   const [page, setPage] = React.useState(1);
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
-  const { data, isLoading } = useSWR(`/cards.json`, fetcher, {
+  const { data, isLoading } = useSWR(process.env.API_GET_URL, fetcher, {
     keepPreviousData: true,
   });
 

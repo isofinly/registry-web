@@ -2,6 +2,7 @@
 // Util hooks
 import React from "react";
 import useSWR from "swr";
+import axios from "axios";
 import { useEffect, useState } from "react";
 import { VariableSizeList } from "react-window";
 import useMediaQuery from "@mui/material/useMediaQuery";
@@ -30,6 +31,7 @@ import {
   Input,
   Select,
   SelectItem,
+  Skeleton,
   Checkbox,
 } from "@nextui-org/react";
 import { useTheme, styled } from "@mui/material/styles";
@@ -213,24 +215,122 @@ export default function Page() {
   const [inputCardValue, setCardInputValue] = React.useState("");
   const [inputStatusValue, setStatusInputValue] = React.useState("");
   const [isStatusChangeAllowed, setStatusChangeAllowed] = React.useState(false);
+  // const [userSumbitData, setUserSumbitData] = React.useState(new Object({}))
+
+  const [data, setData] = useState({
+    user: "",
+    status: "",
+    gender: "",
+    email: "",
+    last_name: "",
+    middle_name: "",
+    birth_date: "",
+    snils: "",
+    city: "",
+    card_id: "",
+  });
+
+  function sendData() {
+    
+    if (isStatusChangeAllowed) {
+      axios
+        .post(proccess.env.API_POST_URL, data)
+        .then((response) => {
+          console.log(response.data);
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    }
+  }
+
+  const [cardSubmitData, setCardData] = useState({
+    user: "",
+    status: "",
+    card_number: "",
+  });
+
+  function sendCardData() {
+    if (isStatusChangeAllowed) {
+      axios
+        .post(proccess.env.API_POST_URL, cardSubmitData)
+        .then((response) => {
+          console.log(response.data);
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    }
+  }
+
+  const [transactionSubmitData, setTransactionData] = useState({
+    id: "",
+    status: "",
+  });
+
+  function sendTransactionData() {
+    if (isStatusChangeAllowed) {
+      axios
+        .post(proccess.env.API_POST_URL, transactionSubmitData)
+        .then((response) => {
+          console.log(response.data);
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    }
+  }
+
+  const [benefitData, setBenefitData] = useState({
+    amount: "",
+    card_data: [],
+    time: {
+      active_since: "",
+      active_until: "",
+    },
+    status: "",
+    name: "",
+    info: "",
+  });
+
+  function sendBenefitData() {
+    if (isStatusChangeAllowed) {
+      axios
+        .post(proccess.env.API_POST_URL, benefitData)
+        .then((response) => {
+          console.log(response.data);
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    }
+  }
+
   /* const [data_, setData] = React.useState([]); */
 
   const iconClasses =
     "text-xl text-default-500 pointer-events-none flex-shrink-0";
 
-  const { data: userData } = useSWR(`/users.json`, fetcher, {
+  const { data: userData } = useSWR(process.env.API_GET_URL, fetcher, {
     keepPreviousData: true,
   });
-  const { data: cardData } = useSWR(`/cards.json`, fetcher, {
+  const { data: cardData } = useSWR(process.env.API_GET_URL, fetcher, {
     keepPreviousData: true,
   });
-  const { data: transactionData } = useSWR(`/transactionData.json`, fetcher, {
+  const { data: transactionData } = useSWR(process.env.API_GET_URL, fetcher, {
+    keepPreviousData: true,
+  });
+  const { data: benefitsData } = useSWR(process.env.API_GET_URL, fetcher, {
     keepPreviousData: true,
   });
 
   const users = React.useMemo(
     () => userData?.results || [],
     [userData?.results]
+  );
+  const benefits = React.useMemo(
+    () => benefitsData?.results || [],
+    [benefitsData?.results]
   );
   const cards = React.useMemo(
     () => cardData?.results || [],
@@ -370,21 +470,19 @@ export default function Page() {
                                 inputValue={inputCardValue}
                                 onInputChange={(event, newInputValue) => {
                                   setCardInputValue(newInputValue);
+                                  setCardData({
+                                    ...cardSubmitData,
+                                    card_number: newInputValue,
+                                  });
                                 }}
                                 PopperComponent={StyledPopper}
                                 ListboxComponent={ListboxComponent}
-                                options={cards.map(
-                                  (card) =>
-                                    "Номер: " +
-                                    card.card_number +
-                                    " | " +
-                                    card.status
-                                )}
+                                options={cards.map((card) => card.card_number)}
                                 // groupBy={(option) => option[0].toUpperCase()}
                                 renderInput={(params) => (
                                   <TextField
                                     {...params}
-                                    label="Карта ..."
+                                    label="Номер карты ..."
                                     sx={{
                                       "& .MuiOutlinedInput-root": {
                                         borderRadius: "50px",
@@ -424,11 +522,15 @@ export default function Page() {
                                 inputValue={inputStatusValue}
                                 onInputChange={(event, newInputValue) => {
                                   setStatusInputValue(newInputValue);
+                                  setCardData({
+                                    ...cardSubmitData,
+                                    status: newInputValue,
+                                  });
                                 }}
                                 PopperComponent={StyledPopper}
                                 ListboxComponent={ListboxComponent}
                                 options={cardStatus.map(
-                                  (status) => "Статус: " + status.name
+                                  (status) => status.name
                                 )}
                                 // groupBy={(option) => option[0].toUpperCase()}
                                 renderInput={(params) => (
@@ -468,7 +570,11 @@ export default function Page() {
                                 renderGroup={(params) => params}
                               />
                               <div className="flex gap-2 justify-end">
-                                <Button fullWidth color="primary">
+                                <Button
+                                  fullWidth
+                                  color="primary"
+                                  onPress={sendCardData}
+                                >
                                   Изменить статус
                                 </Button>
                                 <Checkbox
@@ -481,19 +587,33 @@ export default function Page() {
                               </div>
                             </div>
                           </Tab>
-                          <Tab key="new-card" title="Регистрация">
+                          <Tab key="new-card" title="Регистрация карты">
                             <div className="flex flex-col gap-4">
                               <Input
                                 isRequired
                                 label="Номер карты"
                                 placeholder="Введите номер карты"
-                                type="text"
+                                type="number"
+                                value={cardSubmitData.card_number}
+                                onChange={(e) => {
+                                  setCardData({
+                                    ...cardSubmitData,
+                                    card_number: e.target.value,
+                                  });
+                                }}
                               />
                               <Input
                                 isRequired
                                 label="Пользователь"
                                 placeholder="Введите id пользователя"
                                 type="number"
+                                value={cardSubmitData.user}
+                                onChange={(e) => {
+                                  setCardData({
+                                    ...cardSubmitData,
+                                    user: e.target.value,
+                                  });
+                                }}
                               />
                               <Autocomplete
                                 id="card-status-input"
@@ -502,11 +622,15 @@ export default function Page() {
                                 inputValue={inputStatusValue}
                                 onInputChange={(event, newInputValue) => {
                                   setStatusInputValue(newInputValue);
+                                  setCardData({
+                                    ...cardSubmitData,
+                                    status: newInputValue,
+                                  });
                                 }}
                                 PopperComponent={StyledPopper}
                                 ListboxComponent={ListboxComponent}
                                 options={cardStatus.map(
-                                  (status) => "Статус: " + status.name
+                                  (status) => status.name
                                 )}
                                 // groupBy={(option) => option[0].toUpperCase()}
                                 renderInput={(params) => (
@@ -545,14 +669,12 @@ export default function Page() {
                                 // TODO: Post React 18 update - validate this conversion, look like a hidden bug
                                 renderGroup={(params) => params}
                               />
-                              <Input
-                                isRequired
-                                label="ID карты"
-                                placeholder="ID карты"
-                                type="number"
-                              />
                               <div className="flex gap-2 justify-end">
-                                <Button fullWidth color="primary">
+                                <Button
+                                  fullWidth
+                                  color="primary"
+                                  onPress={sendCardData}
+                                >
                                   Зарегистрировать
                                 </Button>
                                 <Checkbox
@@ -567,57 +689,62 @@ export default function Page() {
                           </Tab>
                           <Tab key="changes-history" title="История изменений">
                             <div className="flex flex-col gap-4 h-[300px]">
-                              <Autocomplete
-                                id="card-input"
-                                sx={{ width: 300 }}
-                                disableListWrap
-                                inputValue={inputUserValue}
-                                onInputChange={(event, newInputValue) => {
-                                  setUserInputValue(newInputValue);
-                                }}
-                                PopperComponent={StyledPopper}
-                                ListboxComponent={ListboxComponent}
-                                options={cards.map(
-                                  (card) =>
-                                    "ID: " + card.id + " | " + card.card_number
-                                )}
-                                // groupBy={(option) => option[0].toUpperCase()}
-                                renderInput={(params) => (
-                                  <TextField
-                                    {...params}
-                                    label="Карта ..."
-                                    sx={{
-                                      "& .MuiOutlinedInput-root": {
-                                        borderRadius: "50px",
+                              <Skeleton className="rounded-lg">
+                                <Autocomplete
+                                  id="card-input"
+                                  sx={{ width: 300 }}
+                                  disableListWrap
+                                  inputValue={inputUserValue}
+                                  onInputChange={(event, newInputValue) => {
+                                    setUserInputValue(newInputValue);
+                                  }}
+                                  PopperComponent={StyledPopper}
+                                  ListboxComponent={ListboxComponent}
+                                  options={cards.map(
+                                    (card) =>
+                                      "ID: " +
+                                      card.id +
+                                      " | " +
+                                      card.card_number
+                                  )}
+                                  // groupBy={(option) => option[0].toUpperCase()}
+                                  renderInput={(params) => (
+                                    <TextField
+                                      {...params}
+                                      label="Карта ..."
+                                      sx={{
+                                        "& .MuiOutlinedInput-root": {
+                                          borderRadius: "50px",
 
-                                        legend: {
-                                          marginLeft: "30px",
+                                          legend: {
+                                            marginLeft: "30px",
+                                          },
                                         },
-                                      },
-                                      "& .MuiAutocomplete-inputRoot": {
-                                        paddingLeft: "20px !important",
-                                        borderRadius: "12px",
-                                      },
-                                      "& .MuiInputLabel-outlined": {
-                                        paddingLeft: "20px",
-                                      },
-                                      "& .MuiInputLabel-shrink": {
-                                        marginLeft: "20px",
-                                        paddingLeft: "10px",
-                                        paddingRight: 0,
-                                        background: "white",
-                                      },
-                                    }}
-                                  />
-                                )}
-                                renderOption={(props, option, state) => [
-                                  props,
-                                  option,
-                                  state.index,
-                                ]}
-                                // TODO: Post React 18 update - validate this conversion, look like a hidden bug
-                                renderGroup={(params) => params}
-                              />
+                                        "& .MuiAutocomplete-inputRoot": {
+                                          paddingLeft: "20px !important",
+                                          borderRadius: "12px",
+                                        },
+                                        "& .MuiInputLabel-outlined": {
+                                          paddingLeft: "20px",
+                                        },
+                                        "& .MuiInputLabel-shrink": {
+                                          marginLeft: "20px",
+                                          paddingLeft: "10px",
+                                          paddingRight: 0,
+                                          background: "white",
+                                        },
+                                      }}
+                                    />
+                                  )}
+                                  renderOption={(props, option, state) => [
+                                    props,
+                                    option,
+                                    state.index,
+                                  ]}
+                                  // TODO: Post React 18 update - validate this conversion, look like a hidden bug
+                                  renderGroup={(params) => params}
+                                />
+                              </Skeleton>
                             </div>
                           </Tab>
                           <Tab key="edit-user" title="Изменение данных">
@@ -626,21 +753,22 @@ export default function Page() {
                                 id="card-input"
                                 sx={{ width: 300 }}
                                 disableListWrap
-                                inputValue={inputUserValue}
+                                inputValue={inputCardValue}
                                 onInputChange={(event, newInputValue) => {
-                                  setUserInputValue(newInputValue);
+                                  setCardInputValue(newInputValue);
+                                  setCardData({
+                                    ...cardSubmitData,
+                                    card_number: newInputValue,
+                                  });
                                 }}
                                 PopperComponent={StyledPopper}
                                 ListboxComponent={ListboxComponent}
-                                options={cards.map(
-                                  (card) =>
-                                    "ID: " + card.id + " | " + card.card_number
-                                )}
+                                options={cards.map((card) => card.card_number)}
                                 // groupBy={(option) => option[0].toUpperCase()}
                                 renderInput={(params) => (
                                   <TextField
                                     {...params}
-                                    label="Карта ..."
+                                    label="Номер карты ..."
                                     sx={{
                                       "& .MuiOutlinedInput-root": {
                                         borderRadius: "50px",
@@ -673,17 +801,19 @@ export default function Page() {
                                 // TODO: Post React 18 update - validate this conversion, look like a hidden bug
                                 renderGroup={(params) => params}
                               />
-                              <Input
-                                isRequired
-                                label="Номер карты"
-                                placeholder="Введите номер карты"
-                                type="text"
-                              />
+
                               <Input
                                 isRequired
                                 label="Пользователь"
                                 placeholder="Введите id пользователя"
                                 type="number"
+                                value={cardSubmitData.user}
+                                onChange={(e) => {
+                                  setCardData({
+                                    ...cardSubmitData,
+                                    user: e.target.value,
+                                  });
+                                }}
                               />
                               <Autocomplete
                                 id="card-status-input"
@@ -692,11 +822,15 @@ export default function Page() {
                                 inputValue={inputStatusValue}
                                 onInputChange={(event, newInputValue) => {
                                   setStatusInputValue(newInputValue);
+                                  setCardData({
+                                    ...cardSubmitData,
+                                    status: newInputValue,
+                                  });
                                 }}
                                 PopperComponent={StyledPopper}
                                 ListboxComponent={ListboxComponent}
                                 options={cardStatus.map(
-                                  (status) => "Статус: " + status.name
+                                  (status) => status.name
                                 )}
                                 // groupBy={(option) => option[0].toUpperCase()}
                                 renderInput={(params) => (
@@ -735,15 +869,12 @@ export default function Page() {
                                 // TODO: Post React 18 update - validate this conversion, look like a hidden bug
                                 renderGroup={(params) => params}
                               />
-                              <Input
-                                isRequired
-                                label="ID карты"
-                                placeholder="ID карты"
-                                type="number"
-                              />
-
                               <div className="flex gap-2 justify-end">
-                                <Button fullWidth color="warning">
+                                <Button
+                                  fullWidth
+                                  color="warning"
+                                  onPress={sendCardData}
+                                >
                                   Изменить
                                 </Button>
                                 <Checkbox
@@ -758,92 +889,102 @@ export default function Page() {
                           </Tab>
                           <Tab key="ban-card" title="Блокировка">
                             <div className="flex flex-col gap-4 h-[300px]">
-                              <Autocomplete
-                                id="card-input"
-                                sx={{ width: 300 }}
-                                disableListWrap
-                                inputValue={inputUserValue}
-                                onInputChange={(event, newInputValue) => {
-                                  setUserInputValue(newInputValue);
-                                }}
-                                PopperComponent={StyledPopper}
-                                ListboxComponent={ListboxComponent}
-                                options={cards.map(
-                                  (card) =>
-                                    "ID: " + card.id + " | " + card.card_number
-                                )}
-                                // groupBy={(option) => option[0].toUpperCase()}
-                                renderInput={(params) => (
-                                  <TextField
-                                    {...params}
-                                    label="Карта ..."
-                                    sx={{
-                                      "& .MuiOutlinedInput-root": {
-                                        borderRadius: "50px",
+                              <Skeleton className="rounded-lg">
+                                <Autocomplete
+                                  id="card-input"
+                                  sx={{ width: 300 }}
+                                  disableListWrap
+                                  inputValue={inputCardValue}
+                                  onInputChange={(event, newInputValue) => {
+                                    setCardInputValue(newInputValue);
+                                    setCardData({
+                                      ...cardSubmitData,
+                                      card_number: newInputValue,
+                                    });
+                                  }}
+                                  PopperComponent={StyledPopper}
+                                  ListboxComponent={ListboxComponent}
+                                  options={cards.map(
+                                    (card) => card.card_number
+                                  )}
+                                  // groupBy={(option) => option[0].toUpperCase()}
+                                  renderInput={(params) => (
+                                    <TextField
+                                      {...params}
+                                      label="Номер карты ..."
+                                      sx={{
+                                        "& .MuiOutlinedInput-root": {
+                                          borderRadius: "50px",
 
-                                        legend: {
-                                          marginLeft: "30px",
+                                          legend: {
+                                            marginLeft: "30px",
+                                          },
                                         },
-                                      },
-                                      "& .MuiAutocomplete-inputRoot": {
-                                        paddingLeft: "20px !important",
-                                        borderRadius: "12px",
-                                      },
-                                      "& .MuiInputLabel-outlined": {
-                                        paddingLeft: "20px",
-                                      },
-                                      "& .MuiInputLabel-shrink": {
-                                        marginLeft: "20px",
-                                        paddingLeft: "10px",
-                                        paddingRight: 0,
-                                        background: "white",
-                                      },
-                                    }}
-                                  />
-                                )}
-                                renderOption={(props, option, state) => [
-                                  props,
-                                  option,
-                                  state.index,
-                                ]}
-                                // TODO: Post React 18 update - validate this conversion, look like a hidden bug
-                                renderGroup={(params) => params}
-                              />
-                              <div className="flex gap-2 justify-end">
-                                <Button fullWidth color="danger">
-                                  Забанить
-                                </Button>
-                                <Checkbox
-                                  isSelected={isStatusChangeAllowed}
-                                  onValueChange={setStatusChangeAllowed}
-                                  color="danger"
-                                >
-                                  Подтвердить
-                                </Checkbox>
-                              </div>
+                                        "& .MuiAutocomplete-inputRoot": {
+                                          paddingLeft: "20px !important",
+                                          borderRadius: "12px",
+                                        },
+                                        "& .MuiInputLabel-outlined": {
+                                          paddingLeft: "20px",
+                                        },
+                                        "& .MuiInputLabel-shrink": {
+                                          marginLeft: "20px",
+                                          paddingLeft: "10px",
+                                          paddingRight: 0,
+                                          background: "white",
+                                        },
+                                      }}
+                                    />
+                                  )}
+                                  renderOption={(props, option, state) => [
+                                    props,
+                                    option,
+                                    state.index,
+                                  ]}
+                                  // TODO: Post React 18 update - validate this conversion, look like a hidden bug
+                                  renderGroup={(params) => params}
+                                />
+                                <div className="flex gap-2 justify-end">
+                                  <Button
+                                    fullWidth
+                                    color="danger"
+                                    onPress={sendCardData}
+                                  >
+                                    Забанить
+                                  </Button>
+                                  <Checkbox
+                                    isSelected={isStatusChangeAllowed}
+                                    onValueChange={setStatusChangeAllowed}
+                                    color="danger"
+                                  >
+                                    Подтвердить
+                                  </Checkbox>
+                                </div>
+                              </Skeleton>
                             </div>
                           </Tab>
-                          <Tab key="delete-user" title="Удаление">
+                          <Tab key="delete-card" title="Удаление">
                             <div className="flex flex-col gap-4 h-[300px]">
                               <Autocomplete
                                 id="card-input"
                                 sx={{ width: 300 }}
                                 disableListWrap
-                                inputValue={inputUserValue}
+                                inputValue={inputCardValue}
                                 onInputChange={(event, newInputValue) => {
-                                  setUserInputValue(newInputValue);
+                                  setCardInputValue(newInputValue);
+                                  setCardData({
+                                    ...cardSubmitData,
+                                    card_number: newInputValue,
+                                  });
                                 }}
                                 PopperComponent={StyledPopper}
                                 ListboxComponent={ListboxComponent}
-                                options={cards.map(
-                                  (card) =>
-                                    "ID: " + card.id + " | " + card.card_number
-                                )}
+                                options={cards.map((card) => card.card_number)}
                                 // groupBy={(option) => option[0].toUpperCase()}
                                 renderInput={(params) => (
                                   <TextField
                                     {...params}
-                                    label="Карта ..."
+                                    label="Номер карты ..."
                                     sx={{
                                       "& .MuiOutlinedInput-root": {
                                         borderRadius: "50px",
@@ -877,7 +1018,11 @@ export default function Page() {
                                 renderGroup={(params) => params}
                               />
                               <div className="flex gap-2 justify-end">
-                                <Button fullWidth color="danger">
+                                <Button
+                                  fullWidth
+                                  color="danger"
+                                  onPress={sendCardData}
+                                >
                                   Удалить
                                 </Button>
                                 <Checkbox
@@ -899,7 +1044,7 @@ export default function Page() {
                             variant="flat"
                             onPress={onClose}
                           >
-                            Close
+                            Закрыть
                           </Button>
                           <Button color="" variant="bordered" onPress={onClose}>
                             Справка
@@ -1015,22 +1160,14 @@ export default function Page() {
                                 sx={{ width: 300 }}
                                 disableListWrap
                                 inputValue={inputUserValue}
-                                onInputChange={(event, newInputValue) => {
+                                value={data.user}
+                                onInputChange={(e, newInputValue) => {
                                   setUserInputValue(newInputValue);
+                                  setData({ ...data, user: newInputValue });
                                 }}
                                 PopperComponent={StyledPopper}
                                 ListboxComponent={ListboxComponent}
-                                options={users.map(
-                                  (user) =>
-                                    "ID: " +
-                                    user.id +
-                                    " | " +
-                                    user.first_name +
-                                    " " +
-                                    user.middle_name +
-                                    " " +
-                                    user.last_name
-                                )}
+                                options={users.map((user) => user.id)}
                                 // groupBy={(option) => option[0].toUpperCase()}
                                 renderInput={(params) => (
                                   <TextField
@@ -1073,13 +1210,15 @@ export default function Page() {
                                 sx={{ width: 300 }}
                                 disableListWrap
                                 inputValue={inputStatusValue}
-                                onInputChange={(event, newInputValue) => {
+                                value={data.status}
+                                onInputChange={(e, newInputValue) => {
                                   setStatusInputValue(newInputValue);
+                                  setData({ ...data, status: newInputValue });
                                 }}
                                 PopperComponent={StyledPopper}
                                 ListboxComponent={ListboxComponent}
                                 options={userStatus.map(
-                                  (status) => "Статус: " + status.name
+                                  (status) => status.name
                                 )}
                                 // groupBy={(option) => option[0].toUpperCase()}
                                 renderInput={(params) => (
@@ -1119,7 +1258,11 @@ export default function Page() {
                                 renderGroup={(params) => params}
                               />
                               <div className="flex gap-2 justify-end">
-                                <Button fullWidth color="primary">
+                                <Button
+                                  fullWidth
+                                  color="primary"
+                                  onPress={sendData}
+                                >
                                   Изменить статус
                                 </Button>
                                 <Checkbox
@@ -1139,24 +1282,49 @@ export default function Page() {
                                 label="Имя"
                                 placeholder="Введите имя"
                                 type="text"
+                                value={data.first_name}
+                                onChange={(e) => {
+                                  setData({
+                                    ...data,
+                                    first_name: e.target.value,
+                                  });
+                                }}
                               />
                               <Input
                                 isRequired
                                 label="Фамилия"
                                 placeholder="Введите фамилию"
                                 type="text"
+                                value={data.last_name}
+                                onChange={(e) => {
+                                  setData({
+                                    ...data,
+                                    last_name: e.target.value,
+                                  });
+                                }}
                               />
                               <Input
                                 isRequired
                                 label="Отчество"
                                 placeholder="Введите отчество"
                                 type="text"
+                                value={data.middle_name}
+                                onChange={(e) => {
+                                  setData({
+                                    ...data,
+                                    middle_name: e.target.value,
+                                  });
+                                }}
                               />
                               <Select
                                 label="Пол"
                                 variant="bordered"
                                 placeholder="Выберите пол"
                                 selectedKeys={gender}
+                                value={data.gender}
+                                onChange={(e) => {
+                                  setData({ ...data, gender: e.target.value });
+                                }}
                                 className="max-w-xs"
                                 onSelectionChange={setGender}
                               >
@@ -1172,24 +1340,43 @@ export default function Page() {
                                 label="Email"
                                 placeholder="Email"
                                 type="email"
+                                value={data.email}
+                                onChange={(e) => {
+                                  setData({ ...data, email: e.target.value });
+                                }}
                               />
                               <Input
                                 isRequired
                                 label="Дата рождения"
                                 placeholder="Email"
                                 type="date"
+                                value={data.birth_date}
+                                onChange={(e) => {
+                                  setData({
+                                    ...data,
+                                    birth_date: e.target.value,
+                                  });
+                                }}
                               />
                               <Input
                                 isRequired
                                 label="СНИЛС"
                                 placeholder="СНИЛС"
                                 type="text"
+                                value={data.snils}
+                                onChange={(e) => {
+                                  setData({ ...data, snils: e.target.value });
+                                }}
                               />
                               <Input
                                 isRequired
                                 label="Город"
                                 placeholder="город"
                                 type="text"
+                                value={data.city}
+                                onChange={(e) => {
+                                  setData({ ...data, city: e.target.value });
+                                }}
                               />
                               <Autocomplete
                                 id="status-input"
@@ -1246,9 +1433,17 @@ export default function Page() {
                                 label="ID карты"
                                 placeholder="ID карты"
                                 type="number"
+                                value={data.card_id}
+                                onChange={(e) => {
+                                  setData({ ...data, card_id: e.target.value });
+                                }}
                               />
                               <div className="flex gap-2 justify-end">
-                                <Button fullWidth color="primary">
+                                <Button
+                                  fullWidth
+                                  color="primary"
+                                  onPress={sendData}
+                                >
                                   Зарегистрировать
                                 </Button>
                                 <Checkbox
@@ -1271,25 +1466,16 @@ export default function Page() {
                                 inputValue={inputUserValue}
                                 onInputChange={(event, newInputValue) => {
                                   setUserInputValue(newInputValue);
+                                  setData({ ...data, user: newInputValue });
                                 }}
                                 PopperComponent={StyledPopper}
                                 ListboxComponent={ListboxComponent}
-                                options={users.map(
-                                  (user) =>
-                                    "ID: " +
-                                    user.id +
-                                    " | " +
-                                    user.first_name +
-                                    " " +
-                                    user.middle_name +
-                                    " " +
-                                    user.last_name
-                                )}
+                                options={users.map((user) => user.id)}
                                 // groupBy={(option) => option[0].toUpperCase()}
                                 renderInput={(params) => (
                                   <TextField
                                     {...params}
-                                    label="Пользователь ..."
+                                    label="ID пользователя ..."
                                     sx={{
                                       "& .MuiOutlinedInput-root": {
                                         borderRadius: "50px",
@@ -1327,24 +1513,49 @@ export default function Page() {
                                 label="Имя"
                                 placeholder="Введите имя"
                                 type="text"
+                                value={data.first_name}
+                                onChange={(e) => {
+                                  setData({
+                                    ...data,
+                                    first_name: e.target.value,
+                                  });
+                                }}
                               />
                               <Input
                                 isRequired
                                 label="Фамилия"
                                 placeholder="Введите фамилию"
                                 type="text"
+                                value={data.last_name}
+                                onChange={(e) => {
+                                  setData({
+                                    ...data,
+                                    last_name: e.target.value,
+                                  });
+                                }}
                               />
                               <Input
                                 isRequired
                                 label="Отчество"
                                 placeholder="Введите отчество"
                                 type="text"
+                                value={data.middle_name}
+                                onChange={(e) => {
+                                  setData({
+                                    ...data,
+                                    middle_name: e.target.value,
+                                  });
+                                }}
                               />
                               <Select
                                 label="Пол"
                                 variant="bordered"
                                 placeholder="Выберите пол"
                                 selectedKeys={gender}
+                                value={data.gender}
+                                onChange={(e) => {
+                                  setData({ ...data, gender: e.target.value });
+                                }}
                                 className="max-w-xs"
                                 onSelectionChange={setGender}
                               >
@@ -1360,24 +1571,43 @@ export default function Page() {
                                 label="Email"
                                 placeholder="Email"
                                 type="email"
+                                value={data.email}
+                                onChange={(e) => {
+                                  setData({ ...data, email: e.target.value });
+                                }}
                               />
                               <Input
                                 isRequired
                                 label="Дата рождения"
                                 placeholder="Email"
                                 type="date"
+                                value={data.birth_date}
+                                onChange={(e) => {
+                                  setData({
+                                    ...data,
+                                    birth_date: e.target.value,
+                                  });
+                                }}
                               />
                               <Input
                                 isRequired
                                 label="СНИЛС"
                                 placeholder="СНИЛС"
                                 type="text"
+                                value={data.snils}
+                                onChange={(e) => {
+                                  setData({ ...data, snils: e.target.value });
+                                }}
                               />
                               <Input
                                 isRequired
                                 label="Город"
                                 placeholder="город"
                                 type="text"
+                                value={data.city}
+                                onChange={(e) => {
+                                  setData({ ...data, city: e.target.value });
+                                }}
                               />
                               <Autocomplete
                                 id="status-input"
@@ -1386,11 +1616,12 @@ export default function Page() {
                                 inputValue={inputStatusValue}
                                 onInputChange={(event, newInputValue) => {
                                   setStatusInputValue(newInputValue);
+                                  setData({ ...data, status: newInputValue });
                                 }}
                                 PopperComponent={StyledPopper}
                                 ListboxComponent={ListboxComponent}
                                 options={userStatus.map(
-                                  (status) => "Статус: " + status.name
+                                  (status) => status.name
                                 )}
                                 // groupBy={(option) => option[0].toUpperCase()}
                                 renderInput={(params) => (
@@ -1434,10 +1665,18 @@ export default function Page() {
                                 label="ID карты"
                                 placeholder="ID карты"
                                 type="number"
+                                value={data.card_id}
+                                onChange={(e) => {
+                                  setData({ ...data, card_id: e.target.value });
+                                }}
                               />
 
                               <div className="flex gap-2 justify-end">
-                                <Button fullWidth color="warning">
+                                <Button
+                                  fullWidth
+                                  color="warning"
+                                  onPress={sendData}
+                                >
                                   Изменить
                                 </Button>
                                 <Checkbox
@@ -1452,76 +1691,78 @@ export default function Page() {
                           </Tab>
                           <Tab key="ban-user" title="Блокировка">
                             <div className="flex flex-col gap-4 h-[300px]">
-                              <Autocomplete
-                                id="user-input"
-                                sx={{ width: 300 }}
-                                disableListWrap
-                                inputValue={inputUserValue}
-                                onInputChange={(event, newInputValue) => {
-                                  setUserInputValue(newInputValue);
-                                }}
-                                PopperComponent={StyledPopper}
-                                ListboxComponent={ListboxComponent}
-                                options={users.map(
-                                  (user) =>
-                                    "ID: " +
-                                    user.id +
-                                    " | " +
-                                    user.first_name +
-                                    " " +
-                                    user.middle_name +
-                                    " " +
-                                    user.last_name
-                                )}
-                                // groupBy={(option) => option[0].toUpperCase()}
-                                renderInput={(params) => (
-                                  <TextField
-                                    {...params}
-                                    label="Пользователь ..."
-                                    sx={{
-                                      "& .MuiOutlinedInput-root": {
-                                        borderRadius: "50px",
+                              <Skeleton className="rounded-lg">
+                                <Autocomplete
+                                  id="user-input"
+                                  sx={{ width: 300 }}
+                                  disableListWrap
+                                  inputValue={inputUserValue}
+                                  onInputChange={(event, newInputValue) => {
+                                    setUserInputValue(newInputValue);
+                                  }}
+                                  PopperComponent={StyledPopper}
+                                  ListboxComponent={ListboxComponent}
+                                  options={users.map(
+                                    (user) =>
+                                      "ID: " +
+                                      user.id +
+                                      " | " +
+                                      user.first_name +
+                                      " " +
+                                      user.middle_name +
+                                      " " +
+                                      user.last_name
+                                  )}
+                                  // groupBy={(option) => option[0].toUpperCase()}
+                                  renderInput={(params) => (
+                                    <TextField
+                                      {...params}
+                                      label="Пользователь ..."
+                                      sx={{
+                                        "& .MuiOutlinedInput-root": {
+                                          borderRadius: "50px",
 
-                                        legend: {
-                                          marginLeft: "30px",
+                                          legend: {
+                                            marginLeft: "30px",
+                                          },
                                         },
-                                      },
-                                      "& .MuiAutocomplete-inputRoot": {
-                                        paddingLeft: "20px !important",
-                                        borderRadius: "12px",
-                                      },
-                                      "& .MuiInputLabel-outlined": {
-                                        paddingLeft: "20px",
-                                      },
-                                      "& .MuiInputLabel-shrink": {
-                                        marginLeft: "20px",
-                                        paddingLeft: "10px",
-                                        paddingRight: 0,
-                                        background: "white",
-                                      },
-                                    }}
-                                  />
-                                )}
-                                renderOption={(props, option, state) => [
-                                  props,
-                                  option,
-                                  state.index,
-                                ]}
-                                // TODO: Post React 18 update - validate this conversion, look like a hidden bug
-                                renderGroup={(params) => params}
-                              />
-                              <div className="flex gap-2 justify-end">
-                                <Button fullWidth color="danger">
-                                  Забанить
-                                </Button>
-                                <Checkbox
-                                  isSelected={isStatusChangeAllowed}
-                                  onValueChange={setStatusChangeAllowed}
-                                  color="danger"
-                                >
-                                  Подтвердить
-                                </Checkbox>
-                              </div>
+                                        "& .MuiAutocomplete-inputRoot": {
+                                          paddingLeft: "20px !important",
+                                          borderRadius: "12px",
+                                        },
+                                        "& .MuiInputLabel-outlined": {
+                                          paddingLeft: "20px",
+                                        },
+                                        "& .MuiInputLabel-shrink": {
+                                          marginLeft: "20px",
+                                          paddingLeft: "10px",
+                                          paddingRight: 0,
+                                          background: "white",
+                                        },
+                                      }}
+                                    />
+                                  )}
+                                  renderOption={(props, option, state) => [
+                                    props,
+                                    option,
+                                    state.index,
+                                  ]}
+                                  // TODO: Post React 18 update - validate this conversion, look like a hidden bug
+                                  renderGroup={(params) => params}
+                                />
+                                <div className="flex gap-2 justify-end">
+                                  <Button fullWidth color="danger">
+                                    Забанить
+                                  </Button>
+                                  <Checkbox
+                                    isSelected={isStatusChangeAllowed}
+                                    onValueChange={setStatusChangeAllowed}
+                                    color="danger"
+                                  >
+                                    Подтвердить
+                                  </Checkbox>
+                                </div>
+                              </Skeleton>
                             </div>
                           </Tab>
                           <Tab key="delete-user" title="Удаление">
@@ -1533,25 +1774,16 @@ export default function Page() {
                                 inputValue={inputUserValue}
                                 onInputChange={(event, newInputValue) => {
                                   setUserInputValue(newInputValue);
+                                  setData({ ...data, user: newInputValue });
                                 }}
                                 PopperComponent={StyledPopper}
                                 ListboxComponent={ListboxComponent}
-                                options={users.map(
-                                  (user) =>
-                                    "ID: " +
-                                    user.id +
-                                    " | " +
-                                    user.first_name +
-                                    " " +
-                                    user.middle_name +
-                                    " " +
-                                    user.last_name
-                                )}
+                                options={users.map((user) => user.id)}
                                 // groupBy={(option) => option[0].toUpperCase()}
                                 renderInput={(params) => (
                                   <TextField
                                     {...params}
-                                    label="Пользователь ..."
+                                    label="ID Пользователя ..."
                                     sx={{
                                       "& .MuiOutlinedInput-root": {
                                         borderRadius: "50px",
@@ -1585,7 +1817,11 @@ export default function Page() {
                                 renderGroup={(params) => params}
                               />
                               <div className="flex gap-2 justify-end">
-                                <Button fullWidth color="danger">
+                                <Button
+                                  fullWidth
+                                  color="danger"
+                                  onPress={sendData}
+                                >
                                   Удалить
                                 </Button>
                                 <Checkbox
@@ -1607,7 +1843,7 @@ export default function Page() {
                             variant="flat"
                             onPress={onClose}
                           >
-                            Close
+                            Закрыть
                           </Button>
                           <Button color="" variant="bordered" onPress={onClose}>
                             Справка
@@ -1707,21 +1943,21 @@ export default function Page() {
                                 inputValue={inputCardValue}
                                 onInputChange={(event, newInputValue) => {
                                   setCardInputValue(newInputValue);
+                                  setTransactionData({
+                                    ...transactionSubmitData,
+                                    id: newInputValue,
+                                  });
                                 }}
                                 PopperComponent={StyledPopper}
                                 ListboxComponent={ListboxComponent}
                                 options={transactions.map(
-                                  (transaction) =>
-                                    "Номер: " +
-                                    transaction.id +
-                                    " | " +
-                                    transaction.time
+                                  (transaction) => transaction.id
                                 )}
                                 // groupBy={(option) => option[0].toUpperCase()}
                                 renderInput={(params) => (
                                   <TextField
                                     {...params}
-                                    label="Транзакция ..."
+                                    label="ID транзакции ..."
                                     sx={{
                                       "& .MuiOutlinedInput-root": {
                                         borderRadius: "50px",
@@ -1761,11 +1997,15 @@ export default function Page() {
                                 inputValue={inputStatusValue}
                                 onInputChange={(event, newInputValue) => {
                                   setStatusInputValue(newInputValue);
+                                  setTransactionData({
+                                    ...transactionSubmitData,
+                                    status: newInputValue,
+                                  });
                                 }}
                                 PopperComponent={StyledPopper}
                                 ListboxComponent={ListboxComponent}
                                 options={transactionStatus.map(
-                                  (status) => "Статус: " + status.name
+                                  (status) => status.name
                                 )}
                                 // groupBy={(option) => option[0].toUpperCase()}
                                 renderInput={(params) => (
@@ -1805,7 +2045,11 @@ export default function Page() {
                                 renderGroup={(params) => params}
                               />
                               <div className="flex gap-2 justify-end">
-                                <Button fullWidth color="primary">
+                                <Button
+                                  fullWidth
+                                  color="primary"
+                                  onPress={sendTransactionData}
+                                >
                                   Изменить статус
                                 </Button>
                                 <Checkbox
@@ -1820,72 +2064,70 @@ export default function Page() {
                           </Tab>
                           <Tab key="transaction-user" title="Блокировка">
                             <div className="flex flex-col gap-4 h-[300px]">
-                              <Autocomplete
-                                id="transaction-input"
-                                sx={{ width: 300 }}
-                                disableListWrap
-                                inputValue={inputUserValue}
-                                onInputChange={(event, newInputValue) => {
-                                  setUserInputValue(newInputValue);
-                                }}
-                                PopperComponent={StyledPopper}
-                                ListboxComponent={ListboxComponent}
-                                options={transactions.map(
-                                  (transaction) =>
-                                    "ID: " +
-                                    transaction.id +
-                                    " | " +
-                                    transaction.time
-                                )}
-                                // groupBy={(option) => option[0].toUpperCase()}
-                                renderInput={(params) => (
-                                  <TextField
-                                    {...params}
-                                    label="Транзакция ..."
-                                    sx={{
-                                      "& .MuiOutlinedInput-root": {
-                                        borderRadius: "50px",
+                              <Skeleton className="rounded-lg">
+                                <Autocomplete
+                                  id="transaction-input"
+                                  sx={{ width: 300 }}
+                                  disableListWrap
+                                  inputValue={inputUserValue}
+                                  onInputChange={(event, newInputValue) => {
+                                    setUserInputValue(newInputValue);
+                                  }}
+                                  PopperComponent={StyledPopper}
+                                  ListboxComponent={ListboxComponent}
+                                  options={transactions.map(
+                                    (transaction) => transaction.id
+                                  )}
+                                  // groupBy={(option) => option[0].toUpperCase()}
+                                  renderInput={(params) => (
+                                    <TextField
+                                      {...params}
+                                      label="Транзакция ..."
+                                      sx={{
+                                        "& .MuiOutlinedInput-root": {
+                                          borderRadius: "50px",
 
-                                        legend: {
-                                          marginLeft: "30px",
+                                          legend: {
+                                            marginLeft: "30px",
+                                          },
                                         },
-                                      },
-                                      "& .MuiAutocomplete-inputRoot": {
-                                        paddingLeft: "20px !important",
-                                        borderRadius: "12px",
-                                      },
-                                      "& .MuiInputLabel-outlined": {
-                                        paddingLeft: "20px",
-                                      },
-                                      "& .MuiInputLabel-shrink": {
-                                        marginLeft: "20px",
-                                        paddingLeft: "10px",
-                                        paddingRight: 0,
-                                        background: "white",
-                                      },
-                                    }}
-                                  />
-                                )}
-                                renderOption={(props, option, state) => [
-                                  props,
-                                  option,
-                                  state.index,
-                                ]}
-                                // TODO: Post React 18 update - validate this conversion, look like a hidden bug
-                                renderGroup={(params) => params}
-                              />
-                              <div className="flex gap-2 justify-end">
-                                <Button fullWidth color="danger">
-                                  Удалить
-                                </Button>
-                                <Checkbox
-                                  isSelected={isStatusChangeAllowed}
-                                  onValueChange={setStatusChangeAllowed}
-                                  color="danger"
-                                >
-                                  Подтвердить
-                                </Checkbox>
-                              </div>
+                                        "& .MuiAutocomplete-inputRoot": {
+                                          paddingLeft: "20px !important",
+                                          borderRadius: "12px",
+                                        },
+                                        "& .MuiInputLabel-outlined": {
+                                          paddingLeft: "20px",
+                                        },
+                                        "& .MuiInputLabel-shrink": {
+                                          marginLeft: "20px",
+                                          paddingLeft: "10px",
+                                          paddingRight: 0,
+                                          background: "white",
+                                        },
+                                      }}
+                                    />
+                                  )}
+                                  renderOption={(props, option, state) => [
+                                    props,
+                                    option,
+                                    state.index,
+                                  ]}
+                                  // TODO: Post React 18 update - validate this conversion, look like a hidden bug
+                                  renderGroup={(params) => params}
+                                />
+                                <div className="flex gap-2 justify-end">
+                                  <Button fullWidth color="danger">
+                                    Удалить
+                                  </Button>
+                                  <Checkbox
+                                    isSelected={isStatusChangeAllowed}
+                                    onValueChange={setStatusChangeAllowed}
+                                    color="danger"
+                                  >
+                                    Подтвердить
+                                  </Checkbox>
+                                </div>
+                              </Skeleton>
                             </div>
                           </Tab>
                         </Tabs>
@@ -1897,7 +2139,7 @@ export default function Page() {
                             variant="flat"
                             onPress={onClose}
                           >
-                            Close
+                            Закрыть
                           </Button>
                           <Button color="" variant="bordered" onPress={onClose}>
                             Справка
@@ -1995,23 +2237,180 @@ export default function Page() {
                         >
                           <Tab key="new-benefit" title="Добавление">
                             <div className="flex flex-col gap-4">
-                              <Input
-                                isRequired
-                                label="Email"
-                                placeholder="Enter your email"
-                                type="email"
-                              />
-                              <Input
-                                isRequired
-                                label="Password"
-                                placeholder="Enter your password"
-                                type="password"
-                              />
+                              <Autocomplete
+                                id="card-input"
+                                sx={{ width: 300 }}
+                                disableListWrap
+                                multiple
+                                inputValue={inputCardValue}
+                                onInputChange={(event, newInputValue) => {
+                                  setCardInputValue(newInputValue);
+                                  setBenefitData({
+                                    ...benefitData,
+                                    card_data: newInputValue,
+                                  });
+                                }}
+                                PopperComponent={StyledPopper}
+                                ListboxComponent={ListboxComponent}
+                                options={cards.map((card) => card.card_number)}
+                                // groupBy={(option) => option[0].toUpperCase()}
+                                renderInput={(params) => (
+                                  <TextField
+                                    {...params}
+                                    label="Номер карты ..."
+                                    sx={{
+                                      "& .MuiOutlinedInput-root": {
+                                        borderRadius: "50px",
 
+                                        legend: {
+                                          marginLeft: "30px",
+                                        },
+                                      },
+                                      "& .MuiAutocomplete-inputRoot": {
+                                        paddingLeft: "20px !important",
+                                        borderRadius: "12px",
+                                      },
+                                      "& .MuiInputLabel-outlined": {
+                                        paddingLeft: "20px",
+                                      },
+                                      "& .MuiInputLabel-shrink": {
+                                        marginLeft: "20px",
+                                        paddingLeft: "10px",
+                                        paddingRight: 0,
+                                        background: "white",
+                                      },
+                                    }}
+                                  />
+                                )}
+                                renderOption={(props, option, state) => [
+                                  props,
+                                  option,
+                                  state.index,
+                                ]}
+                                // TODO: Post React 18 update - validate this conversion, look like a hidden bug
+                                renderGroup={(params) => params}
+                              />
+                              <Input
+                                isRequired
+                                label="Название"
+                                placeholder="Название"
+                                type="text"
+                                value={benefitData.name}
+                                onChange={(e) => {
+                                  setBenefitData({
+                                    ...benefitData,
+                                    name: e.target.value,
+                                  });
+                                }}
+                              />
+                              <Input
+                                isRequired
+                                label="Начало"
+                                placeholder="дата начала"
+                                type="date"
+                                value={benefitData.time.active_since}
+                                onChange={(e) => {
+                                  setBenefitData({
+                                    ...benefitData,
+                                    time: { active_since: e.target.value },
+                                  });
+                                }}
+                              />
+                              <Input
+                                isRequired
+                                label="Конец"
+                                placeholder="дата конца"
+                                type="date"
+                                value={benefitData.time.active_until}
+                                onChange={(e) => {
+                                  setBenefitData({
+                                    ...benefitData,
+                                    time: { active_until: e.target.value },
+                                  });
+                                }}
+                              />
+                              <Input
+                                isRequired
+                                label="Размер"
+                                placeholder="размер"
+                                type="number"
+                                value={benefitData.amount}
+                                onChange={(e) => {
+                                  setBenefitData({
+                                    ...benefitData,
+                                    amount: e.target.value,
+                                  });
+                                }}
+                              />
+                              <Autocomplete
+                                id="benefit-status-input"
+                                sx={{ width: 300 }}
+                                disableListWrap
+                                inputValue={inputStatusValue}
+                                onInputChange={(event, newInputValue) => {
+                                  setStatusInputValue(newInputValue);
+                                  setBenefitData({
+                                    ...benefitData,
+                                    status: newInputValue,
+                                  });
+                                }}
+                                PopperComponent={StyledPopper}
+                                ListboxComponent={ListboxComponent}
+                                options={transactionStatus.map(
+                                  (status) => status.name
+                                )}
+                                // groupBy={(option) => option[0].toUpperCase()}
+                                renderInput={(params) => (
+                                  <TextField
+                                    {...params}
+                                    label="Статус ..."
+                                    sx={{
+                                      "& .MuiOutlinedInput-root": {
+                                        borderRadius: "50px",
+
+                                        legend: {
+                                          marginLeft: "30px",
+                                        },
+                                      },
+                                      "& .MuiAutocomplete-inputRoot": {
+                                        paddingLeft: "20px !important",
+                                        borderRadius: "12px",
+                                      },
+                                      "& .MuiInputLabel-outlined": {
+                                        paddingLeft: "20px",
+                                      },
+                                      "& .MuiInputLabel-shrink": {
+                                        marginLeft: "20px",
+                                        paddingLeft: "10px",
+                                        paddingRight: 0,
+                                        background: "white",
+                                      },
+                                    }}
+                                  />
+                                )}
+                                renderOption={(props, option, state) => [
+                                  props,
+                                  option,
+                                  state.index,
+                                ]}
+                                // TODO: Post React 18 update - validate this conversion, look like a hidden bug
+                                renderGroup={(params) => params}
+                              />
                               <div className="flex gap-2 justify-end">
-                                <Button fullWidth color="primary">
-                                  Login
+                                <Button
+                                  fullWidth
+                                  color="primary"
+                                  onPress={sendBenefitData}
+                                >
+                                  Добавить
                                 </Button>
+                                <Checkbox
+                                  isSelected={isStatusChangeAllowed}
+                                  onValueChange={setStatusChangeAllowed}
+                                  color="danger"
+                                >
+                                  Подтвердить
+                                </Checkbox>
                               </div>
                             </div>
                           </Tab>
@@ -2020,86 +2419,434 @@ export default function Page() {
                             title="Изменение статуса"
                           >
                             <div className="flex flex-col gap-4 h-[300px]">
-                              <Input
-                                isRequired
-                                label="Name"
-                                placeholder="Enter your name"
-                                type="password"
-                              />
-                              <Input
-                                isRequired
-                                label="Email"
-                                placeholder="Enter your email"
-                                type="email"
-                              />
-                              <Input
-                                isRequired
-                                label="Password"
-                                placeholder="Enter your password"
-                                type="password"
-                              />
+                              <Autocomplete
+                                id="card-input"
+                                sx={{ width: 300 }}
+                                disableListWrap
+                                multiple
+                                inputValue={inputCardValue}
+                                onInputChange={(event, newInputValue) => {
+                                  setCardInputValue(newInputValue);
+                                  setBenefitData({
+                                    ...benefitData,
+                                    card_data: newInputValue,
+                                  });
+                                }}
+                                PopperComponent={StyledPopper}
+                                ListboxComponent={ListboxComponent}
+                                options={benefits.map((benefit) => benefit.id)}
+                                // groupBy={(option) => option[0].toUpperCase()}
+                                renderInput={(params) => (
+                                  <TextField
+                                    {...params}
+                                    label="Номер льготы ..."
+                                    sx={{
+                                      "& .MuiOutlinedInput-root": {
+                                        borderRadius: "50px",
 
+                                        legend: {
+                                          marginLeft: "30px",
+                                        },
+                                      },
+                                      "& .MuiAutocomplete-inputRoot": {
+                                        paddingLeft: "20px !important",
+                                        borderRadius: "12px",
+                                      },
+                                      "& .MuiInputLabel-outlined": {
+                                        paddingLeft: "20px",
+                                      },
+                                      "& .MuiInputLabel-shrink": {
+                                        marginLeft: "20px",
+                                        paddingLeft: "10px",
+                                        paddingRight: 0,
+                                        background: "white",
+                                      },
+                                    }}
+                                  />
+                                )}
+                                renderOption={(props, option, state) => [
+                                  props,
+                                  option,
+                                  state.index,
+                                ]}
+                                // TODO: Post React 18 update - validate this conversion, look like a hidden bug
+                                renderGroup={(params) => params}
+                              />
+                              <Autocomplete
+                                id="benefit-status-input"
+                                sx={{ width: 300 }}
+                                disableListWrap
+                                inputValue={inputStatusValue}
+                                onInputChange={(event, newInputValue) => {
+                                  setStatusInputValue(newInputValue);
+                                  setBenefitData({
+                                    ...benefitData,
+                                    status: newInputValue,
+                                  });
+                                }}
+                                PopperComponent={StyledPopper}
+                                ListboxComponent={ListboxComponent}
+                                options={transactionStatus.map(
+                                  (status) => status.name
+                                )}
+                                // groupBy={(option) => option[0].toUpperCase()}
+                                renderInput={(params) => (
+                                  <TextField
+                                    {...params}
+                                    label="Статус ..."
+                                    sx={{
+                                      "& .MuiOutlinedInput-root": {
+                                        borderRadius: "50px",
+
+                                        legend: {
+                                          marginLeft: "30px",
+                                        },
+                                      },
+                                      "& .MuiAutocomplete-inputRoot": {
+                                        paddingLeft: "20px !important",
+                                        borderRadius: "12px",
+                                      },
+                                      "& .MuiInputLabel-outlined": {
+                                        paddingLeft: "20px",
+                                      },
+                                      "& .MuiInputLabel-shrink": {
+                                        marginLeft: "20px",
+                                        paddingLeft: "10px",
+                                        paddingRight: 0,
+                                        background: "white",
+                                      },
+                                    }}
+                                  />
+                                )}
+                                renderOption={(props, option, state) => [
+                                  props,
+                                  option,
+                                  state.index,
+                                ]}
+                                // TODO: Post React 18 update - validate this conversion, look like a hidden bug
+                                renderGroup={(params) => params}
+                              />
                               <div className="flex gap-2 justify-end">
-                                <Button fullWidth color="primary">
-                                  Sign up
+                                <Button
+                                  fullWidth
+                                  color="primary"
+                                  onPress={sendBenefitData}
+                                >
+                                  Изменить
                                 </Button>
+                                <Checkbox
+                                  isSelected={isStatusChangeAllowed}
+                                  onValueChange={setStatusChangeAllowed}
+                                  color="danger"
+                                >
+                                  Подтвердить
+                                </Checkbox>
                               </div>
                             </div>
                           </Tab>
                           <Tab key="edit-benefit" title="Изменение данных">
                             <div className="flex flex-col gap-4 h-[300px]">
-                              <Input
-                                isRequired
-                                label="Name"
-                                placeholder="Enter your name"
-                                type="password"
-                              />
-                              <Input
-                                isRequired
-                                label="Email"
-                                placeholder="Enter your email"
-                                type="email"
-                              />
-                              <Input
-                                isRequired
-                                label="Password"
-                                placeholder="Enter your password"
-                                type="password"
-                              />
+                              <Autocomplete
+                                id="card-input"
+                                sx={{ width: 300 }}
+                                disableListWrap
+                                multiple
+                                inputValue={inputCardValue}
+                                onInputChange={(event, newInputValue) => {
+                                  setCardInputValue(newInputValue);
+                                  setBenefitData({
+                                    ...benefitData,
+                                    card_data: newInputValue,
+                                  });
+                                }}
+                                PopperComponent={StyledPopper}
+                                ListboxComponent={ListboxComponent}
+                                options={cards.map((card) => card.card_number)}
+                                // groupBy={(option) => option[0].toUpperCase()}
+                                renderInput={(params) => (
+                                  <TextField
+                                    {...params}
+                                    label="Номер карты ..."
+                                    sx={{
+                                      "& .MuiOutlinedInput-root": {
+                                        borderRadius: "50px",
 
+                                        legend: {
+                                          marginLeft: "30px",
+                                        },
+                                      },
+                                      "& .MuiAutocomplete-inputRoot": {
+                                        paddingLeft: "20px !important",
+                                        borderRadius: "12px",
+                                      },
+                                      "& .MuiInputLabel-outlined": {
+                                        paddingLeft: "20px",
+                                      },
+                                      "& .MuiInputLabel-shrink": {
+                                        marginLeft: "20px",
+                                        paddingLeft: "10px",
+                                        paddingRight: 0,
+                                        background: "white",
+                                      },
+                                    }}
+                                  />
+                                )}
+                                renderOption={(props, option, state) => [
+                                  props,
+                                  option,
+                                  state.index,
+                                ]}
+                                // TODO: Post React 18 update - validate this conversion, look like a hidden bug
+                                renderGroup={(params) => params}
+                              />
+                              <Input
+                                isRequired
+                                label="Название"
+                                placeholder="Название"
+                                type="text"
+                                value={benefitData.name}
+                                onChange={(e) => {
+                                  setBenefitData({
+                                    ...benefitData,
+                                    name: e.target.value,
+                                  });
+                                }}
+                              />
+                              <Input
+                                isRequired
+                                label="Начало"
+                                placeholder="дата начала"
+                                type="date"
+                                value={benefitData.time.active_since}
+                                onChange={(e) => {
+                                  setBenefitData({
+                                    ...benefitData,
+                                    time: { active_since: e.target.value },
+                                  });
+                                }}
+                              />
+                              <Input
+                                isRequired
+                                label="Конец"
+                                placeholder="дата конца"
+                                type="date"
+                                value={benefitData.time.active_until}
+                                onChange={(e) => {
+                                  setBenefitData({
+                                    ...benefitData,
+                                    time: { active_until: e.target.value },
+                                  });
+                                }}
+                              />
+                              <Input
+                                isRequired
+                                label="Размер"
+                                placeholder="размер"
+                                type="number"
+                                value={benefitData.amount}
+                                onChange={(e) => {
+                                  setBenefitData({
+                                    ...benefitData,
+                                    amount: e.target.value,
+                                  });
+                                }}
+                              />
+                              <Autocomplete
+                                id="benefit-input"
+                                sx={{ width: 300 }}
+                                disableListWrap
+                                multiple
+                                inputValue={inputCardValue}
+                                onInputChange={(event, newInputValue) => {
+                                  setCardInputValue(newInputValue);
+                                  setBenefitData({
+                                    ...benefitData,
+                                    card_data: newInputValue,
+                                  });
+                                }}
+                                PopperComponent={StyledPopper}
+                                ListboxComponent={ListboxComponent}
+                                options={benefits.map((benefit) => benefit.id)}
+                                // groupBy={(option) => option[0].toUpperCase()}
+                                renderInput={(params) => (
+                                  <TextField
+                                    {...params}
+                                    label="Номер льготы ..."
+                                    sx={{
+                                      "& .MuiOutlinedInput-root": {
+                                        borderRadius: "50px",
+
+                                        legend: {
+                                          marginLeft: "30px",
+                                        },
+                                      },
+                                      "& .MuiAutocomplete-inputRoot": {
+                                        paddingLeft: "20px !important",
+                                        borderRadius: "12px",
+                                      },
+                                      "& .MuiInputLabel-outlined": {
+                                        paddingLeft: "20px",
+                                      },
+                                      "& .MuiInputLabel-shrink": {
+                                        marginLeft: "20px",
+                                        paddingLeft: "10px",
+                                        paddingRight: 0,
+                                        background: "white",
+                                      },
+                                    }}
+                                  />
+                                )}
+                                renderOption={(props, option, state) => [
+                                  props,
+                                  option,
+                                  state.index,
+                                ]}
+                                // TODO: Post React 18 update - validate this conversion, look like a hidden bug
+                                renderGroup={(params) => params}
+                              />
+                              <Autocomplete
+                                id="benefit-status-input"
+                                sx={{ width: 300 }}
+                                disableListWrap
+                                inputValue={inputStatusValue}
+                                onInputChange={(event, newInputValue) => {
+                                  setStatusInputValue(newInputValue);
+                                  setBenefitData({
+                                    ...benefitData,
+                                    status: newInputValue,
+                                  });
+                                }}
+                                PopperComponent={StyledPopper}
+                                ListboxComponent={ListboxComponent}
+                                options={transactionStatus.map(
+                                  (status) => status.name
+                                )}
+                                // groupBy={(option) => option[0].toUpperCase()}
+                                renderInput={(params) => (
+                                  <TextField
+                                    {...params}
+                                    label="Статус ..."
+                                    sx={{
+                                      "& .MuiOutlinedInput-root": {
+                                        borderRadius: "50px",
+
+                                        legend: {
+                                          marginLeft: "30px",
+                                        },
+                                      },
+                                      "& .MuiAutocomplete-inputRoot": {
+                                        paddingLeft: "20px !important",
+                                        borderRadius: "12px",
+                                      },
+                                      "& .MuiInputLabel-outlined": {
+                                        paddingLeft: "20px",
+                                      },
+                                      "& .MuiInputLabel-shrink": {
+                                        marginLeft: "20px",
+                                        paddingLeft: "10px",
+                                        paddingRight: 0,
+                                        background: "white",
+                                      },
+                                    }}
+                                  />
+                                )}
+                                renderOption={(props, option, state) => [
+                                  props,
+                                  option,
+                                  state.index,
+                                ]}
+                                // TODO: Post React 18 update - validate this conversion, look like a hidden bug
+                                renderGroup={(params) => params}
+                              />
                               <div className="flex gap-2 justify-end">
-                                <Button fullWidth color="primary">
-                                  Sign up
+                                <Button
+                                  fullWidth
+                                  color="primary"
+                                  onPress={sendBenefitData}
+                                >
+                                  Изменить
                                 </Button>
+                                <Checkbox
+                                  isSelected={isStatusChangeAllowed}
+                                  onValueChange={setStatusChangeAllowed}
+                                  color="danger"
+                                >
+                                  Подтвердить
+                                </Checkbox>
                               </div>
                             </div>
                           </Tab>
                           <Tab key="delete-benefit" title="Удаление">
                             <div className="flex flex-col gap-4 h-[300px]">
-                              <Input
-                                isRequired
-                                label="Name"
-                                placeholder="Enter your name"
-                                type="password"
-                              />
-                              <Input
-                                isRequired
-                                label="Email"
-                                placeholder="Enter your email"
-                                type="email"
-                              />
-                              <Input
-                                isRequired
-                                label="Password"
-                                placeholder="Enter your password"
-                                type="password"
-                              />
+                              <Autocomplete
+                                id="benefit-input"
+                                sx={{ width: 300 }}
+                                disableListWrap
+                                multiple
+                                inputValue={inputCardValue}
+                                onInputChange={(event, newInputValue) => {
+                                  setCardInputValue(newInputValue);
+                                  setBenefitData({
+                                    ...benefitData,
+                                    card_data: newInputValue,
+                                  });
+                                }}
+                                PopperComponent={StyledPopper}
+                                ListboxComponent={ListboxComponent}
+                                options={benefits.map((benefit) => benefit.id)}
+                                // groupBy={(option) => option[0].toUpperCase()}
+                                renderInput={(params) => (
+                                  <TextField
+                                    {...params}
+                                    label="Номер льготы ..."
+                                    sx={{
+                                      "& .MuiOutlinedInput-root": {
+                                        borderRadius: "50px",
 
-                              <div className="flex gap-2 justify-end">
-                                <Button fullWidth color="primary">
-                                  Sign up
-                                </Button>
-                              </div>
+                                        legend: {
+                                          marginLeft: "30px",
+                                        },
+                                      },
+                                      "& .MuiAutocomplete-inputRoot": {
+                                        paddingLeft: "20px !important",
+                                        borderRadius: "12px",
+                                      },
+                                      "& .MuiInputLabel-outlined": {
+                                        paddingLeft: "20px",
+                                      },
+                                      "& .MuiInputLabel-shrink": {
+                                        marginLeft: "20px",
+                                        paddingLeft: "10px",
+                                        paddingRight: 0,
+                                        background: "white",
+                                      },
+                                    }}
+                                  />
+                                )}
+                                renderOption={(props, option, state) => [
+                                  props,
+                                  option,
+                                  state.index,
+                                ]}
+                                // TODO: Post React 18 update - validate this conversion, look like a hidden bug
+                                renderGroup={(params) => params}
+                              />
+                                <div className="flex gap-2 justify-end">
+                                  <Button
+                                    fullWidth
+                                    color="danger"
+                                    onPress={sendBenefitData}
+                                  >
+                                    Удалить
+                                  </Button>
+                                  <Checkbox
+                                    isSelected={isStatusChangeAllowed}
+                                    onValueChange={setStatusChangeAllowed}
+                                    color="danger"
+                                  >
+                                    Подтвердить
+                                  </Checkbox>
+                                </div>
                             </div>
                           </Tab>
                         </Tabs>
@@ -2111,7 +2858,7 @@ export default function Page() {
                             variant="flat"
                             onPress={onClose}
                           >
-                            Close
+                            Закрыть
                           </Button>
                           <Button color="" variant="bordered" onPress={onClose}>
                             Справка
@@ -2302,7 +3049,7 @@ export default function Page() {
                             variant="flat"
                             onPress={onClose}
                           >
-                            Close
+                            Закрыть
                           </Button>
                           <Button color="" variant="bordered" onPress={onClose}>
                             Справка
@@ -2385,95 +3132,97 @@ export default function Page() {
                         Сервисы
                       </ModalHeader>
                       <ModalBody>
-                        <Tabs
-                          fullWidth
-                          size="md"
-                          aria-label="Tabs div"
-                          selectedKey={selected}
-                          onSelectionChange={setSelected}
-                        >
-                          <Tab key="new-service" title="Добавление">
-                            <div className="flex flex-col gap-4">
-                              <Input
-                                isRequired
-                                label="Email"
-                                placeholder="Enter your email"
-                                type="email"
-                              />
-                              <Input
-                                isRequired
-                                label="Password"
-                                placeholder="Enter your password"
-                                type="password"
-                              />
-
-                              <div className="flex gap-2 justify-end">
-                                <Button fullWidth color="primary">
-                                  Login
-                                </Button>
-                              </div>
-                            </div>
-                          </Tab>
-                          <Tab
-                            key="service-state-change"
-                            title="Изменение статуса"
+                        <Skeleton className="rounded-lg">
+                          <Tabs
+                            fullWidth
+                            size="md"
+                            aria-label="Tabs div"
+                            selectedKey={selected}
+                            onSelectionChange={setSelected}
                           >
-                            <div className="flex flex-col gap-4 h-[300px]">
-                              <Input
-                                isRequired
-                                label="Name"
-                                placeholder="Enter your name"
-                                type="password"
-                              />
-                              <Input
-                                isRequired
-                                label="Email"
-                                placeholder="Enter your email"
-                                type="email"
-                              />
-                              <Input
-                                isRequired
-                                label="Password"
-                                placeholder="Enter your password"
-                                type="password"
-                              />
+                            <Tab key="new-service" title="Добавление">
+                              <div className="flex flex-col gap-4">
+                                <Input
+                                  isRequired
+                                  label="Email"
+                                  placeholder="Enter your email"
+                                  type="email"
+                                />
+                                <Input
+                                  isRequired
+                                  label="Password"
+                                  placeholder="Enter your password"
+                                  type="password"
+                                />
 
-                              <div className="flex gap-2 justify-end">
-                                <Button fullWidth color="primary">
-                                  Sign up
-                                </Button>
+                                <div className="flex gap-2 justify-end">
+                                  <Button fullWidth color="primary">
+                                    Login
+                                  </Button>
+                                </div>
                               </div>
-                            </div>
-                          </Tab>
-                          <Tab key="delete-service" title="Удаление">
-                            <div className="flex flex-col gap-4 h-[300px]">
-                              <Input
-                                isRequired
-                                label="Name"
-                                placeholder="Enter your name"
-                                type="password"
-                              />
-                              <Input
-                                isRequired
-                                label="Email"
-                                placeholder="Enter your email"
-                                type="email"
-                              />
-                              <Input
-                                isRequired
-                                label="Password"
-                                placeholder="Enter your password"
-                                type="password"
-                              />
+                            </Tab>
+                            <Tab
+                              key="service-state-change"
+                              title="Изменение статуса"
+                            >
+                              <div className="flex flex-col gap-4 h-[300px]">
+                                <Input
+                                  isRequired
+                                  label="Name"
+                                  placeholder="Enter your name"
+                                  type="password"
+                                />
+                                <Input
+                                  isRequired
+                                  label="Email"
+                                  placeholder="Enter your email"
+                                  type="email"
+                                />
+                                <Input
+                                  isRequired
+                                  label="Password"
+                                  placeholder="Enter your password"
+                                  type="password"
+                                />
 
-                              <div className="flex gap-2 justify-end">
-                                <Button fullWidth color="primary">
-                                  Sign up
-                                </Button>
+                                <div className="flex gap-2 justify-end">
+                                  <Button fullWidth color="primary">
+                                    Sign up
+                                  </Button>
+                                </div>
                               </div>
-                            </div>
-                          </Tab>
-                        </Tabs>
+                            </Tab>
+                            <Tab key="delete-service" title="Удаление">
+                              <div className="flex flex-col gap-4 h-[300px]">
+                                <Input
+                                  isRequired
+                                  label="Name"
+                                  placeholder="Enter your name"
+                                  type="password"
+                                />
+                                <Input
+                                  isRequired
+                                  label="Email"
+                                  placeholder="Enter your email"
+                                  type="email"
+                                />
+                                <Input
+                                  isRequired
+                                  label="Password"
+                                  placeholder="Enter your password"
+                                  type="password"
+                                />
+
+                                <div className="flex gap-2 justify-end">
+                                  <Button fullWidth color="primary">
+                                    Sign up
+                                  </Button>
+                                </div>
+                              </div>
+                            </Tab>
+                          </Tabs>
+                        </Skeleton>
                       </ModalBody>
                       <ModalFooter>
                         <ButtonGroup>
@@ -2482,7 +3231,7 @@ export default function Page() {
                             variant="flat"
                             onPress={onClose}
                           >
-                            Close
+                            Закрыть
                           </Button>
                           <Button color="" variant="bordered" onPress={onClose}>
                             Справка
@@ -2549,58 +3298,60 @@ export default function Page() {
                         Использование API
                       </ModalHeader>
                       <ModalBody>
-                        <Tabs
-                          fullWidth
-                          size="md"
-                          aria-label="Tabs div"
-                          selectedKey={selected}
-                          onSelectionChange={setSelected}
-                        >
-                          <Tab key="info" title="Просмотр">
-                            <div className="flex flex-col gap-4">
-                              <Input
-                                isRequired
-                                label="Password"
-                                placeholder="Enter your password"
-                                type="password"
-                              />
+                        <Skeleton className="rounded-lg">
+                          <Tabs
+                            fullWidth
+                            size="md"
+                            aria-label="Tabs div"
+                            selectedKey={selected}
+                            onSelectionChange={setSelected}
+                          >
+                            <Tab key="info" title="Просмотр">
+                              <div className="flex flex-col gap-4">
+                                <Input
+                                  isRequired
+                                  label="Password"
+                                  placeholder="Enter your password"
+                                  type="password"
+                                />
 
-                              <div className="flex gap-2 justify-end">
-                                <Button fullWidth color="primary">
-                                  Login
-                                </Button>
+                                <div className="flex gap-2 justify-end">
+                                  <Button fullWidth color="primary">
+                                    Login
+                                  </Button>
+                                </div>
                               </div>
-                            </div>
-                          </Tab>
-                          <Tab key="service-state-change" title="Экспорт">
-                            <div className="flex flex-col gap-4 h-[300px]">
-                              <Input
-                                isRequired
-                                label="Name"
-                                placeholder="Enter your name"
-                                type="password"
-                              />
-                              <Input
-                                isRequired
-                                label="Email"
-                                placeholder="Enter your email"
-                                type="email"
-                              />
-                              <Input
-                                isRequired
-                                label="Password"
-                                placeholder="Enter your password"
-                                type="password"
-                              />
+                            </Tab>
+                            <Tab key="service-state-change" title="Экспорт">
+                              <div className="flex flex-col gap-4 h-[300px]">
+                                <Input
+                                  isRequired
+                                  label="Name"
+                                  placeholder="Enter your name"
+                                  type="password"
+                                />
+                                <Input
+                                  isRequired
+                                  label="Email"
+                                  placeholder="Enter your email"
+                                  type="email"
+                                />
+                                <Input
+                                  isRequired
+                                  label="Password"
+                                  placeholder="Enter your password"
+                                  type="password"
+                                />
 
-                              <div className="flex gap-2 justify-end">
-                                <Button fullWidth color="primary">
-                                  Sign up
-                                </Button>
+                                <div className="flex gap-2 justify-end">
+                                  <Button fullWidth color="primary">
+                                    Sign up
+                                  </Button>
+                                </div>
                               </div>
-                            </div>
-                          </Tab>
-                        </Tabs>
+                            </Tab>
+                          </Tabs>
+                        </Skeleton>
                       </ModalBody>
                       <ModalFooter>
                         <ButtonGroup>
@@ -2609,7 +3360,7 @@ export default function Page() {
                             variant="flat"
                             onPress={onClose}
                           >
-                            Close
+                            Закрыть
                           </Button>
                           <Button color="" variant="bordered" onPress={onClose}>
                             Справка

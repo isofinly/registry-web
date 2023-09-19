@@ -87,7 +87,7 @@ export default function Page() {
           <Card
             isPressable
             disableRipple={true}
-            onPress={() => onCardOpen()}
+            // onPress={() => onCardOpen()}
             className="py-4 w-full col-span-2"
           >
             <CardHeader className="pb-0 pt-2 px-4 flex-col items-start">
@@ -154,7 +154,7 @@ export default function Page() {
                 <Button
                   variant="flat"
                   color="primary"
-                  onPress={() => onCardOpen()}
+                  // onPress={() => onCardOpen()}
                 >
                   Панель управления
                 </Button>
@@ -399,7 +399,7 @@ export default function Page() {
                 <Button
                   variant="flat"
                   color="primary"
-                  onPress={() => onCardOpen()}
+                  // onPress={() => onCardOpen()}
                 >
                   Панель управления
                 </Button>
@@ -467,7 +467,7 @@ export default function Page() {
                 <Button
                   variant="flat"
                   color="primary"
-                  onPress={() => onCardOpen()}
+                  // onPress={() => onCardOpen()}
                 >
                   Панель управления
                 </Button>
@@ -537,7 +537,7 @@ export default function Page() {
                 <Button
                   variant="flat"
                   color="primary"
-                  onPress={() => onCardOpen()}
+                  // onPress={() => onCardOpen()}
                 >
                   Панель управления
                 </Button>
@@ -607,7 +607,7 @@ export default function Page() {
                 <Button
                   variant="flat"
                   color="primary"
-                  onPress={() => onCardOpen()}
+                  // onPress={() => onCardOpen()}
                 >
                   Панель управления
                 </Button>
