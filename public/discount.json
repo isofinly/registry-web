@@ -11,7 +11,13 @@
         "end": "2021-09-17T10:00:00Z"
       },
       "status": "active",
-      "izk": true
+      "izk": true,
+      "card_data": [
+        { "card_number": 5463, "card_id": 1 },
+        { "card_number": 2435, "card_id": 16 },
+        { "card_number": 534245634563, "card_id": 64536 },
+        { "card_number": 5436345643, "card_id": 435 }
+      ]
     },
     {
       "id": 2,
@@ -24,7 +30,13 @@
         "end": "2025-09-17T10:00:00Z"
       },
       "status": "pause",
-      "izk": true
+      "izk": true,
+      "card_data": [
+        { "card_number": 32464573456, "card_id": 345 },
+        { "card_number": 65874, "card_id": 213 },
+        { "card_number": 84763456, "card_id": 243 },
+        { "card_number": 48576, "card_id": 543 }
+      ]
     },
     {
       "id": 3,
@@ -37,7 +49,13 @@
         "end": "2023-09-17T10:00:00Z"
       },
       "status": "pause",
-      "izk": false
+      "izk": false,
+      "card_data": [
+        { "card_number": 634563456, "card_id": 534 },
+        { "card_number": 54362254648, "card_id": 45 },
+        { "card_number": 356835654, "card_id": 546 },
+        { "card_number": 45735687654, "card_id": 2345 }
+      ]
     },
     {
       "id": 4,
@@ -50,7 +68,13 @@
         "end": "2021-09-17T10:00:00Z"
       },
       "status": "active",
-      "izk": false
+      "izk": false,
+      "card_data": [
+        { "card_number": 345346354, "card_id": 234 },
+        { "card_number": 4573457, "card_id": 54 },
+        { "card_number": 64576, "card_id": 43 },
+        { "card_number": 3457345, "card_id": 45 }
+      ]
     },
     {
       "id": 5,
@@ -63,7 +87,13 @@
         "end": "2025-09-17T10:00:00Z"
       },
       "status": "active",
-      "izk": true
+      "izk": true,
+      "card_data": [
+        { "card_number": 1234567890123456, "card_id": 1 },
+        { "card_number": 1234567890123456, "card_id": 12 },
+        { "card_number": 1234567890123456, "card_id": 13 },
+        { "card_number": 1234567890123456, "card_id": 14 }
+      ]
     },
     {
       "id": 6,
@@ -76,7 +106,13 @@
         "end": "2023-09-17T10:00:00Z"
       },
       "status": "delete",
-      "izk": false
+      "izk": false,
+      "card_data": [
+        { "card_number": 1234567890123456, "card_id": 1 },
+        { "card_number": 1234567890123456, "card_id": 12 },
+        { "card_number": 1234567890123456, "card_id": 13 },
+        { "card_number": 1234567890123456, "card_id": 14 }
+      ]
     }
   ]
 }
